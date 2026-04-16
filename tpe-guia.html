@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TPE Redes — The Store | ITBA 1C 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #07091a;
+      --bg2: #0c1028;
+      --card: rgba(255,255,255,0.028);
+      --card-hover: rgba(255,255,255,0.05);
+      --border: rgba(255,255,255,0.07);
+      --border-bright: rgba(255,255,255,0.15);
+      --cyan: #00d4ff;
+      --cyan-dim: rgba(0,212,255,0.12);
+      --amber: #ffaa00;
+      --amber-dim: rgba(255,170,0,0.12);
+      --text: #c4d0e8;
+      --text-dim: #5a6a88;
+      --text-bright: #eef2fc;
+      --muy-alta: #10e89a;
+      --alta: #4ade80;
+      --media-alta: #a3e635;
+      --media: #fbbf24;
+      --baja-media: #fb923c;
+      --baja: #f87171;
+      --r: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(0,212,255,0.07) 0%, transparent 60%),
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,9,26,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 52px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--cyan);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      margin-right: 2rem;
+      flex-shrink: 0;
+    }
+    .nav-pills {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .nav-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .nav-pill:hover {
+      color: var(--cyan);
+      border-color: rgba(0,212,255,0.3);
+      background: var(--cyan-dim);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 80px 2rem 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .hero-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--cyan);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.8;
+    }
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      color: var(--text-bright);
+      margin-bottom: 24px;
+    }
+    .hero h1 span { color: var(--cyan); }
+    .hero-desc {
+      max-width: 600px;
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      border-left: 2px solid var(--border-bright);
+      padding-left: 1.2rem;
+    }
+
+    /* ── SECTION TITLES ── */
+    .section-header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 24px;
+    }
+    .section-header h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.06em;
+      color: var(--text-bright);
+    }
+    .section-header .line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      max-width: 1100px;
+      margin: 0 auto 80px;
+      padding: 0 2rem;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    thead tr {
+      border-bottom: 1px solid var(--border-bright);
+    }
+    thead th {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    thead th:first-child { padding-left: 0; }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    tbody tr:hover { background: var(--card-hover); }
+    tbody tr:hover .row-num { color: var(--cyan); }
+    td {
+      padding: 13px 14px;
+      vertical-align: middle;
+    }
+    td:first-child { padding-left: 0; }
+    .row-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      transition: color 0.2s;
+    }
+    .row-name {
+      font-weight: 500;
+      color: var(--text-bright);
+      white-space: nowrap;
+    }
+    .row-tech {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--amber);
+      opacity: 0.7;
+    }
+
+    /* Rating badges */
+    .badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+      border: 1px solid currentColor;
+    }
+    .badge-5  { color: var(--muy-alta); background: rgba(16,232,154,0.1); }
+    .badge-4  { color: var(--alta);     background: rgba(74,222,128,0.1); }
+    .badge-35 { color: var(--media-alta); background: rgba(163,230,53,0.1); }
+    .badge-3  { color: var(--media);    background: rgba(251,191,36,0.1); }
+    .badge-2  { color: var(--baja-media); background: rgba(251,146,60,0.1); }
+    .badge-1  { color: var(--baja);     background: rgba(248,113,113,0.1); }
+
+    /* Highlight best/worst */
+    .best-row { background: rgba(0,212,255,0.03); }
+
+    /* ── QUICK READ ── */
+    .quick-cards {
+      max-width: 1100px;
+      margin: 0 auto 80px;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .qcard {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px 18px;
+    }
+    .qcard-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--cyan);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .qcard-title {
+      font-weight: 600;
+      color: var(--text-bright);
+      font-size: 0.88rem;
+      margin-bottom: 4px;
+    }
+    .qcard-desc {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ── TOPIC CARDS ── */
+    .topics {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2rem 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .topic-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .topic-card:hover { border-color: var(--border-bright); }
+    .topic-card.open { border-color: rgba(0,212,255,0.25); }
+
+    .topic-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .topic-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      line-height: 1;
+      color: rgba(255,255,255,0.08);
+      min-width: 48px;
+      transition: color 0.3s;
+    }
+    .topic-card.open .topic-number,
+    .topic-card:hover .topic-number { color: var(--cyan); }
+
+    .topic-meta { flex: 1; }
+    .topic-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.05em;
+      color: var(--text-bright);
+      line-height: 1.1;
+    }
+    .topic-tech {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--amber);
+      opacity: 0.65;
+      margin-top: 3px;
+    }
+
+    .topic-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .topic-chevron {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      transition: transform 0.3s, color 0.3s;
+      margin-left: 8px;
+    }
+    .topic-card.open .topic-chevron { transform: rotate(180deg); color: var(--cyan); }
+
+    .topic-body {
+      display: none;
+      padding: 0 24px 28px;
+      border-top: 1px solid var(--border);
+    }
+    .topic-card.open .topic-body { display: block; }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    @media (max-width: 700px) {
+      .topic-grid { grid-template-columns: 1fr; }
+      .topic-badges { display: none; }
+    }
+
+    .topic-section h4 {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+    .topic-section p {
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.75;
+    }
+    .topic-section ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .topic-section ul li {
+      font-size: 0.86rem;
+      color: var(--text);
+      padding-left: 18px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .topic-section ul li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--cyan);
+      font-size: 0.7rem;
+      top: 3px;
+    }
+
+    .example-box {
+      background: rgba(255,170,0,0.05);
+      border: 1px solid rgba(255,170,0,0.18);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 var(--r) var(--r) 0;
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.75;
+      margin-top: 10px;
+    }
+
+    .aporte-box {
+      background: rgba(0,212,255,0.04);
+      border: 1px solid rgba(0,212,255,0.15);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 var(--r) var(--r) 0;
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.75;
+      margin-top: 10px;
+    }
+
+    .util-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .util-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+    }
+
+    /* Full-width section spans both columns */
+    .topic-section.full { grid-column: 1 / -1; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 2rem;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-label, .hero h1, .hero-desc {
+      animation: fadeUp 0.6s ease both;
+    }
+    .hero h1 { animation-delay: 0.1s; }
+    .hero-desc { animation-delay: 0.2s; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">TPE · THE STORE</span>
+  <div class="nav-pills">
+    <a class="nav-pill" href="#tabla">Tabla</a>
+    <a class="nav-pill" href="#t1">01 IaC</a>
+    <a class="nav-pill" href="#t2">02 Zabbix</a>
+    <a class="nav-pill" href="#t3">03 Grafana</a>
+    <a class="nav-pill" href="#t4">04 VPN</a>
+    <a class="nav-pill" href="#t5">05 ELK</a>
+    <a class="nav-pill" href="#t6">06 K8s</a>
+    <a class="nav-pill" href="#t7">07 CI/CD</a>
+    <a class="nav-pill" href="#t8">08 Mesh</a>
+    <a class="nav-pill" href="#t9">09 WAF</a>
+    <a class="nav-pill" href="#t10">10 Scan</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-label">ITBA · Redes de Información · 1C 2026</p>
+  <h1>THE <span>STORE</span><br>TPE GUIDE</h1>
+  <p class="hero-desc">
+    Guía comparativa de los 10 temas disponibles para el Trabajo Práctico Especial.
+    Incluye descripción, plan de implementación, ejemplo concreto, utilidad personal y aporte al proyecto.
+  </p>
+</div>
+
+<!-- TABLE -->
+<div id="tabla">
+  <div class="section-header">
+    <h2>Tabla Comparativa</h2>
+    <div class="line"></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tema</th>
+          <th>Complejidad</th>
+          <th>Visibilidad Demo</th>
+          <th>Utilidad Personal</th>
+          <th>Relevancia Industria</th>
+          <th>Hardware</th>
+          <th>Transferibilidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="jumpTo('t1')">
+          <td><span class="row-num">01</span></td>
+          <td><span class="row-name">Terraform / Pulumi</span><br><span class="row-tech">IaC</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+          <td><span class="badge badge-5">Baja</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+        </tr>
+        <tr onclick="jumpTo('t2')">
+          <td><span class="row-num">02</span></td>
+          <td><span class="row-name">Zabbix</span><br><span class="row-tech">Monitoring</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-2">Baja-Media</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-1">Baja</span></td>
+        </tr>
+        <tr class="best-row" onclick="jumpTo('t3')">
+          <td><span class="row-num">03</span></td>
+          <td><span class="row-name">Grafana Stack</span><br><span class="row-tech">Prometheus · Loki · Tempo</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+        </tr>
+        <tr onclick="jumpTo('t4')">
+          <td><span class="row-num">04</span></td>
+          <td><span class="row-name">VPN</span><br><span class="row-tech">OpenVPN · WireGuard · Tailscale</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-1">Baja</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-5">Baja</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+        </tr>
+        <tr onclick="jumpTo('t5')">
+          <td><span class="row-num">05</span></td>
+          <td><span class="row-name">ELK / EFK</span><br><span class="row-tech">Elastic · Logstash · Kibana</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-1">Muy Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+        </tr>
+        <tr onclick="jumpTo('t6')">
+          <td><span class="row-num">06</span></td>
+          <td><span class="row-name">Kubernetes / Ansible</span><br><span class="row-tech">K3s · Kind · Ansible</span></td>
+          <td><span class="badge badge-35">Media-Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+        </tr>
+        <tr class="best-row" onclick="jumpTo('t7')">
+          <td><span class="row-num">07</span></td>
+          <td><span class="row-name">CI/CD</span><br><span class="row-tech">GitHub Actions · Jenkins · Helm</span></td>
+          <td><span class="badge badge-2">Baja-Media</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+          <td><span class="badge badge-5">Baja</span></td>
+          <td><span class="badge badge-5">Muy Alta</span></td>
+        </tr>
+        <tr onclick="jumpTo('t8')">
+          <td><span class="row-num">08</span></td>
+          <td><span class="row-name">Service Mesh / API GW</span><br><span class="row-tech">Kuma · Kong</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-35">Media-Alta</span></td>
+          <td><span class="badge badge-35">Media-Alta</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+        </tr>
+        <tr onclick="jumpTo('t9')">
+          <td><span class="row-num">09</span></td>
+          <td><span class="row-name">WAF</span><br><span class="row-tech">ModSecurity · Shadow Daemon</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-2">Baja-Media</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-5">Baja</span></td>
+          <td><span class="badge badge-2">Baja-Media</span></td>
+        </tr>
+        <tr onclick="jumpTo('t10')">
+          <td><span class="row-num">10</span></td>
+          <td><span class="row-name">Security Scanning</span><br><span class="row-tech">OpenVAS · Greenbone · GVM</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+          <td><span class="badge badge-35">Media-Alta</span></td>
+          <td><span class="badge badge-4">Alta</span></td>
+          <td><span class="badge badge-3">Media</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- QUICK READ -->
+<div class="section-header" style="margin-top:0;">
+  <h2>Lectura Rápida</h2>
+  <div class="line"></div>
+</div>
+<div class="quick-cards">
+  <div class="qcard">
+    <p class="qcard-label">Mejor balance general</p>
+    <p class="qcard-title">07 — CI/CD</p>
+    <p class="qcard-desc">Baja complejidad, muy visible, útil desde el día uno, sin hardware extra.</p>
+  </div>
+  <div class="qcard">
+    <p class="qcard-label">Más impacto visual en demo</p>
+    <p class="qcard-title">03 — Grafana Stack</p>
+    <p class="qcard-desc">Dashboards en tiempo real durante el load test. Impresiona a cualquier audiencia.</p>
+  </div>
+  <div class="qcard">
+    <p class="qcard-label">Más valor a largo plazo</p>
+    <p class="qcard-title">01 / 06 — IaC · K8s</p>
+    <p class="qcard-desc">Skills fundamentales de infraestructura que toda empresa usa hoy.</p>
+  </div>
+  <div class="qcard">
+    <p class="qcard-label">Mejor demo de seguridad</p>
+    <p class="qcard-title">09 / 10 — WAF · Scanning</p>
+    <p class="qcard-desc">Ataques bloqueados en vivo y reportes de CVEs son fáciles de explicar a cualquier audiencia.</p>
+  </div>
+  <div class="qcard">
+    <p class="qcard-label">Más pesado de correr</p>
+    <p class="qcard-title">05 — ELK</p>
+    <p class="qcard-desc">Elasticsearch solo necesita 6-8 GB de RAM extra sobre el cluster.</p>
+  </div>
+</div>
+
+<!-- TOPICS -->
+<div class="section-header">
+  <h2>Detalle por Tema</h2>
+  <div class="line"></div>
+</div>
+<div class="topics">
+
+  <!-- T1 -->
+  <div class="topic-card" id="t1">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">01</span>
+      <div class="topic-meta">
+        <div class="topic-title">Gestión de Infraestructura por Código</div>
+        <div class="topic-tech">Terraform · Pulumi</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-3">Complejidad: Media</span>
+        <span class="badge badge-5">Industria: Muy Alta</span>
+        <span class="badge badge-4">Utilidad: Alta</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>En lugar de configurar servidores y clusters manualmente o con scripts de bash, IaC permite describir toda la infraestructura en archivos de código versionables. Si alguien borra el cluster por error, con un solo comando se recrea idéntico. Es la diferencia entre "yo lo armé a mano una vez" y "cualquiera puede replicarlo exactamente".</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Instalar Terraform o Pulumi</li>
+            <li>Escribir código que defina el cluster Kind local (o en la nube: EKS/GKE)</li>
+            <li>Declarar cada recurso de Kubernetes: Deployments, Services, Secrets, ConfigMaps</li>
+            <li>Aplicar con <code>terraform apply</code> y ver cómo levanta todo solo</li>
+            <li>Demostrar destruir y recrear el entorno completo desde cero</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            Hoy existe <code>local.sh create-cluster</code> que hace todo a mano con scripts. Con Terraform, habría un archivo <code>main.tf</code> donde se declara "quiero un cluster con estos 5 servicios y estas variables de entorno" y Terraform se encarga del resto — además de trackear el estado y detectar si algo cambió.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-4">Alta</span></div>
+          <p style="margin-top:10px;">Terraform es de las skills más pedidas en cualquier puesto que no sea puramente frontend. Si alguna vez desplegás un proyecto propio en AWS, GCP o DigitalOcean, IaC te ahorra horas de configuración manual. Para equipos chicos es especialmente valioso porque no hay un DevOps dedicado — el mismo dev que escribe código también levanta la infra.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            Hoy el proyecto depende de <code>local.sh</code> y de que quien lo levante tenga todo instalado correctamente. Con IaC, cualquier integrante (o el docente evaluando) podría reproducir el entorno completo con un solo comando, sin importar la máquina. Además, si el proyecto escalara a la nube, el mismo código Terraform que levanta el cluster local podría apuntar a AWS EKS o GCP GKE sin reescribir nada. The Store pasaría de ser "un proyecto que corre en mi máquina" a "un proyecto que corre en cualquier lugar de forma reproducible".
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T2 -->
+  <div class="topic-card" id="t2">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">02</span>
+      <div class="topic-meta">
+        <div class="topic-title">Observabilidad con Zabbix</div>
+        <div class="topic-tech">Zabbix Server · Agent · Proxy</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-3">Complejidad: Media</span>
+        <span class="badge badge-3">Industria: Media</span>
+        <span class="badge badge-2">Utilidad: Baja-Media</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>Zabbix es una plataforma de monitoreo que permite saber en todo momento si los sistemas están funcionando correctamente. Cuando un servicio se cae o la CPU se dispara, Zabbix lo detecta y puede enviar alertas. Es como tener un vigilante 24/7 mirando todos los servicios.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Desplegar Zabbix Server dentro del cluster (o en una VM aparte)</li>
+            <li>Instalar Zabbix Agent en cada nodo del cluster</li>
+            <li>Configurar Zabbix Proxy si hay múltiples nodos</li>
+            <li>Crear items de monitoreo para los 5 servicios: chequeo HTTP, CPU/RAM, latencia</li>
+            <li>Configurar triggers y alertas ("si Cart no responde en 30s, alertar")</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            Si el servicio <code>checkout</code> se cae y nadie está mirando, los usuarios no pueden comprar y nadie lo sabe hasta que alguien se queja. Con Zabbix, a los 30 segundos de caerse ya hay una alerta en pantalla (o email/Telegram) diciendo "Checkout DOWN en el cluster".
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-2">Baja-Media</span></div>
+          <p style="margin-top:10px;">Zabbix es sólido pero orientado a entornos corporativos grandes con equipos de operaciones dedicados. Para proyectos propios o equipos chicos, el stack de Grafana (tema 3) es mucho más moderno, flexible y usado. Vale aprender los conceptos de monitoreo, pero Zabbix como herramienta específica es poco probable que lo uses fuera de contextos enterprise o infraestructuras legacy.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            The Store actualmente no tiene ningún sistema de alerta si algo falla. Con Zabbix, cada uno de los 5 microservicios tendría un monitor de disponibilidad activo. Si durante la demo el pod de <code>cart</code> se cae por falta de memoria, Zabbix lo detecta en segundos — convirtiendo un problema embarazoso en una demostración del valor del monitoreo. También permitiría ver en tiempo real el consumo de recursos de cada servicio durante el load test que ya incluye el proyecto.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T3 -->
+  <div class="topic-card" id="t3">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">03</span>
+      <div class="topic-meta">
+        <div class="topic-title">Observabilidad con Grafana</div>
+        <div class="topic-tech">Prometheus · Loki · Tempo · Grafana</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-3">Complejidad: Media</span>
+        <span class="badge badge-5">Industria: Muy Alta</span>
+        <span class="badge badge-5">Utilidad: Muy Alta</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>El stack de Grafana es el estándar moderno de observabilidad en microservicios. Combina tres pilares: <strong>métricas</strong> (Prometheus), <strong>logs</strong> (Loki) y <strong>trazas distribuidas</strong> (Tempo), todo visualizado en Grafana. Permite entender no solo si algo falló, sino por qué y en qué parte del flujo.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Desplegar Prometheus, Loki, Tempo y Grafana vía Helm charts</li>
+            <li>Configurar Prometheus para scraping de métricas de cada pod</li>
+            <li>Configurar agentes de Loki para capturar logs de todos los contenedores</li>
+            <li>Instrumentar algún servicio con trazas (ej. Checkout → Orders)</li>
+            <li>Armar dashboards mostrando req/s, latencia P99 y tasa de errores</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            Un usuario reporta que el checkout tarda mucho. Con Tempo podés ver la traza completa del request: UI tardó 5ms, Catalog tardó 8ms, pero Orders tardó 2 segundos. Inmediatamente sabés dónde está el problema sin revisar logs de cada servicio por separado.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-5">Muy Alta</span></div>
+          <p style="margin-top:10px;">Este stack es el estándar de la industria y lo vas a encontrar en prácticamente cualquier empresa tech moderna. Es open source, gratuito, y se usa tanto en startups de 3 personas como en empresas grandes. Para proyectos propios con usuarios reales, detectar un bug en producción antes de que los usuarios se quejen es invaluable. Es la skill de observabilidad más transferible que podés aprender hoy.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            The Store tiene 5 servicios que se comunican en cadena: UI → Catalog, UI → Cart → Orders → Checkout. Sin observabilidad, ese flujo es una caja negra. Con Grafana se volvería completamente transparente: dashboards mostrando req/s por servicio, latencia bajo carga, errores en la cadena. Durante el load test (<code>local.sh load-test</code>), se podría ver en tiempo real cómo cada servicio responde al estrés y dónde aparece el cuello de botella primero.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T4 -->
+  <div class="topic-card" id="t4">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">04</span>
+      <div class="topic-meta">
+        <div class="topic-title">Acceso Remoto Seguro</div>
+        <div class="topic-tech">OpenVPN · WireGuard · Tailscale · EasyRSA</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-3">Complejidad: Media</span>
+        <span class="badge badge-3">Industria: Media</span>
+        <span class="badge badge-3">Utilidad: Media</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>Una VPN crea un túnel cifrado entre dos redes. En vez de exponer el cluster de Kubernetes a internet abierto, solo los clientes conectados a la VPN pueden acceder a los servicios internos. Es el mecanismo que usan las empresas para que los empleados accedan a sistemas internos desde sus casas.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Levantar el cluster de The Store en una VM (VirtualBox o nube)</li>
+            <li>Instalar OpenVPN o WireGuard en esa VM como servidor VPN</li>
+            <li>Generar certificados con EasyRSA (OpenVPN) o claves (WireGuard)</li>
+            <li>Conectar desde otra máquina como cliente VPN</li>
+            <li>Demostrar que desde fuera de la VPN no se puede acceder, y desde dentro sí</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            The Store corre en una VM con IP privada <code>192.168.1.50</code>. Sin VPN, hay que exponer el puerto 80 a internet. Con WireGuard, el compañero de grupo se conecta a la VPN desde su notebook, obtiene IP virtual <code>10.0.0.2</code>, y accede a The Store como si estuviera en la misma red — sin exponer nada al exterior.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-3">Media</span></div>
+          <p style="margin-top:10px;">Entender VPNs te da una base sólida de networking. WireGuard en particular es moderno, simple y muy usado. Lo más práctico para proyectos propios es Tailscale (basado en WireGuard), que conecta tus servidores y dispositivos en una red privada en minutos. Si alguna vez tenés un servidor propio o trabajás con infra remota, vas a cruzarte con esto.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            The Store actualmente solo corre en <code>localhost</code>. Con VPN implementada, el cluster podría correr en una VM centralizada del equipo y cada integrante accedería de forma segura desde su notebook. Para la presentación final, la demo podría correr en un servidor remoto y los docentes accederían via VPN — en lugar de depender de que una sola notebook funcione bien el día de la exposición.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T5 -->
+  <div class="topic-card" id="t5">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">05</span>
+      <div class="topic-meta">
+        <div class="topic-title">Gestión Centralizada de Logs</div>
+        <div class="topic-tech">Elasticsearch · Logstash · Kibana · Fluentd · Beats</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-4">Complejidad: Alta</span>
+        <span class="badge badge-4">Industria: Alta</span>
+        <span class="badge badge-3">Utilidad: Media</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>En microservicios, cada servicio genera sus propios logs. Buscar un error implica entrar a cada contenedor por separado. ELK centraliza todos los logs en un solo lugar con búsqueda poderosa. Es como tener el <code>grep</code> de todos los servicios a la vez, con filtros, gráficos y búsqueda full-text.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Desplegar Elasticsearch (almacenamiento), Logstash/Fluentd (recolección) y Kibana (visualización)</li>
+            <li>Configurar Fluentd como DaemonSet para capturar logs de todos los pods automáticamente</li>
+            <li>Crear índices por servicio: ui-logs, catalog-logs, orders-logs, etc.</li>
+            <li>Armar dashboards en Kibana con filtros por nivel (ERROR, WARN, INFO)</li>
+            <li>Demostrar búsqueda: "todos los errores de Orders en los últimos 10 minutos"</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            El servicio <code>orders</code> lanza una excepción Java a las 3am. Con ELK, a la mañana siguiente buscás en Kibana <code>level:ERROR AND service:orders</code> y ves el stack trace completo — sin necesidad de entrar al pod, que quizás ya se reinició y el log desapareció.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-3">Media</span></div>
+          <p style="margin-top:10px;">Los conceptos detrás de ELK son muy valiosos y Elasticsearch aparece mucho (búsqueda full-text, analytics). Sin embargo, para proyectos propios o equipos chicos ELK puede ser pesado de mantener — consume mucha RAM. En la práctica, para esos casos conviene Loki (tema 3) que es más liviano. Dicho eso, en una empresa mediana-grande, es casi seguro que te crucés con ELK.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            The Store tiene 3 servicios Java (UI, Cart, Orders), uno en Go (Catalog) y uno en Node.js (Checkout) — cada uno con su propio formato de logs. Sin ELK, depurar un flujo completo de compra implica correr <code>kubectl logs</code> en 5 pods distintos y correlacionar manualmente los timestamps. Con ELK, todos esos logs quedan en Kibana con formato unificado y buscable. Para la demo, se podría ejecutar el load test, generar intencionalmente un error en un servicio, y mostrar cómo aparece instantáneamente en Kibana sin tocar ningún pod.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T6 -->
+  <div class="topic-card" id="t6">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">06</span>
+      <div class="topic-meta">
+        <div class="topic-title">Despliegue y Gestión del Cluster</div>
+        <div class="topic-tech">Ansible · K3s · Kind · Minikube · kops</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-35">Complejidad: Media-Alta</span>
+        <span class="badge badge-5">Industria: Muy Alta</span>
+        <span class="badge badge-4">Utilidad: Alta</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>Kubernetes es poderoso pero complejo de instalar y configurar correctamente. Este tema trata sobre automatizar esa instalación y gestión: preparar las VMs, instalar dependencias, crear el cluster y desplegar las aplicaciones. Ansible permite hacer esto de forma reproducible en cualquier máquina con playbooks declarativos.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Tener dos VMs (master + worker) o usar Kind/K3s en local</li>
+            <li>Escribir Ansible Playbooks: instalar Docker, kubectl, configurar el cluster</li>
+            <li>Aplicar el kubernetes.yaml de The Store automáticamente desde el playbook</li>
+            <li>Con un solo comando <code>ansible-playbook deploy.yml</code> levanta todo</li>
+            <li>Demostrar escalado: agregar un worker node y ver cómo K8s redistribuye los pods</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            Hoy, para levantar The Store en una máquina nueva hay que instalar Docker, Kind, kubectl, clonar el repo y correr <code>local.sh</code>. Con Ansible, el playbook hace todo eso automáticamente en cualquier máquina Linux con un solo comando. El docente podría levantar el mismo entorno en su notebook sin instalar nada manualmente.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-4">Alta</span></div>
+          <p style="margin-top:10px;">Kubernetes es el estándar para despliegue de aplicaciones y aprenderlo bien es una inversión que vale mucho. K3s es ideal para proyectos propios — es Kubernetes completo pero liviano, corre en una Raspberry Pi o en un VPS de 1GB RAM. Ansible también es muy útil para automatizar la configuración de cualquier servidor, no solo Kubernetes.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            El proyecto ya usa Kind con <code>local.sh</code>, pero ese script es frágil — si falta una dependencia o la versión de Docker difiere, falla sin mensaje claro. Con Ansible, el setup se vuelve idempotente: podés correrlo 10 veces y siempre queda el mismo resultado correcto. Con K3s en lugar de Kind, el cluster se comporta más parecido a producción real. Para la demo, se podría mostrar un cluster multi-nodo real donde los 5 servicios están distribuidos entre nodos, y Kubernetes los balancea automáticamente.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T7 -->
+  <div class="topic-card" id="t7">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">07</span>
+      <div class="topic-meta">
+        <div class="topic-title">CI/CD</div>
+        <div class="topic-tech">GitHub Actions · Jenkins · Helm · CodePipeline</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-2">Complejidad: Baja-Media</span>
+        <span class="badge badge-5">Industria: Muy Alta</span>
+        <span class="badge badge-5">Utilidad: Muy Alta</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>CI/CD automatiza el proceso de llevar código nuevo a producción. Cada vez que alguien hace un <code>git push</code>, el pipeline automáticamente construye la aplicación, corre los tests y la despliega. Elimina el "funciona en mi máquina" y reduce errores humanos en el deploy.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>El proyecto ya tiene <code>.github/workflows/main.yml</code> — extenderlo</li>
+            <li>Agregar build de imágenes Docker para los 5 servicios y push a GHCR/Docker Hub</li>
+            <li>Agregar los tests E2E automáticos (ya existen con <code>local.sh e2e-test</code>)</li>
+            <li>Empaquetar los servicios en Helm Charts y hacer deploy automático al cluster</li>
+            <li>Demostrar: push en vivo → GitHub Actions construye, testea y despliega solo</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            Se cambia el precio de un producto en el Catalog. Sin CI/CD: buildear la imagen manualmente, subirla al registry, actualizar el deployment en Kubernetes. Con CI/CD: <code>git push</code>, el pipeline lo hace todo en 3 minutos y el cambio está en el cluster automáticamente.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-5">Muy Alta</span></div>
+          <p style="margin-top:10px;">Esta es probablemente la skill más inmediatamente útil para un dev independiente o de equipo chico. GitHub Actions es gratis para repos públicos, increíblemente flexible y está integrado en la herramienta que ya usás. Tener un pipeline que automáticamente corra tests y haga deploy cada push es algo que podés aplicar desde mañana en cualquier proyecto propio. Es lo que todas las empresas dan por sentado que sabés.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            El proyecto ya tiene <code>.github/workflows/main.yml</code> pero básico. Extenderlo con un pipeline completo transformaría The Store en un proyecto con flujo de desarrollo profesional real: cada cambio en cualquiera de los 5 servicios dispara automáticamente el build, los tests E2E, y el deploy al cluster con Helm. Para la demo, el momento más impactante sería modificar un texto en la UI en vivo, hacer push, y en 3 minutos mostrar ese cambio corriendo en el cluster — sin haber tocado nada manualmente.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T8 -->
+  <div class="topic-card" id="t8">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">08</span>
+      <div class="topic-meta">
+        <div class="topic-title">Service Mesh & API Gateway</div>
+        <div class="topic-tech">Kuma · Kong Community · Envoy</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-4">Complejidad: Alta</span>
+        <span class="badge badge-4">Industria: Alta</span>
+        <span class="badge badge-35">Utilidad: Media-Alta</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>Un Service Mesh agrega una capa de infraestructura que gestiona la comunicación entre microservicios: cifrado automático (mTLS), reintentos, circuit breakers y observabilidad de tráfico interno. Kong como API Gateway controla el tráfico externo: autenticación, rate limiting, routing inteligente.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Instalar Kuma en el cluster como control plane del service mesh</li>
+            <li>Inyectar el sidecar proxy (Envoy) en cada pod de The Store automáticamente</li>
+            <li>Configurar políticas: mTLS entre servicios, timeout de 5s para Checkout, circuit breaker en Orders</li>
+            <li>Instalar Kong como Ingress Controller del cluster</li>
+            <li>Configurar rate limiting y demostrar que bloquea el exceso de requests</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            Sin service mesh, si el servicio <code>orders</code> se cae, los requests desde <code>checkout</code> simplemente fallan hasta timeout. Con Kuma y circuit breaker configurado, después de 5 fallos consecutivos devuelve error inmediato sin esperar — protegiendo al resto del sistema de la cascada de fallos.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-35">Media-Alta</span></div>
+          <p style="margin-top:10px;">Kong como API Gateway es muy útil incluso para proyectos chicos: autenticación, rate limiting y routing sin programarlo. El service mesh en cambio es más relevante cuando tenés muchos microservicios — para proyectos propios suele ser overkill. Aprender los conceptos vale, pero probablemente no lo implementes en proyectos pequeños.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            The Store tiene exactamente el tipo de arquitectura donde un service mesh brilla: 5 microservicios que se comunican entre sí sin ningún control ni visibilidad sobre ese tráfico interno. Kuma agregaría mTLS automático entre todos los servicios (actualmente hablan en HTTP plano), circuit breakers para que si <code>orders</code> se satura no arrastre a <code>checkout</code>, y un dashboard de tráfico mostrando el flujo UI → Cart → Orders → Checkout en tiempo real. Kong reemplazaría el Ingress actual con políticas de rate limiting, demostrable con el load generator del proyecto.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T9 -->
+  <div class="topic-card" id="t9">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">09</span>
+      <div class="topic-meta">
+        <div class="topic-title">Protección con WAF</div>
+        <div class="topic-tech">ModSecurity · Shadow Daemon · OWASP CRS</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-3">Complejidad: Media</span>
+        <span class="badge badge-3">Industria: Media</span>
+        <span class="badge badge-2">Utilidad: Baja-Media</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>Un WAF (Web Application Firewall) analiza el contenido de los requests HTTP y bloquea ataques web conocidos: SQL Injection, XSS, path traversal, etc. Se ubica delante de la aplicación web y filtra el tráfico malicioso antes de que llegue al servidor.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Desplegar ModSecurity como módulo de Nginx/Apache frente al servicio <code>ui</code></li>
+            <li>Activar el OWASP Core Rule Set (CRS) con reglas para los ataques más comunes</li>
+            <li>Configurar en modo "detection" primero (solo loguea) y luego "blocking"</li>
+            <li>Demostrar ataques bloqueados: XSS en el buscador, path traversal en la URL</li>
+            <li>Mostrar los logs registrando los intentos bloqueados con código 403</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            El buscador de The Store tiene un campo de texto. Sin WAF, un atacante podría ingresar <code>&lt;script&gt;alert('xss')&lt;/script&gt;</code> y potencialmente ejecutar código en el browser de otros usuarios. Con ModSecurity activado, ese request es bloqueado con 403 antes de llegar a la UI de Spring Boot.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-2">Baja-Media</span></div>
+          <p style="margin-top:10px;">Entender cómo funciona un WAF te hace mejor developer porque te hace pensar en seguridad. Sin embargo, ModSecurity es complejo y para proyectos propios casi siempre hay soluciones más simples (Cloudflare WAF gratuito hace lo mismo con cero configuración). Lo más valioso de este tema es el conocimiento del OWASP Top 10 en sí mismo — eso sí lo aplicás al escribir código seguro en cualquier proyecto.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            La UI de The Store es una aplicación Java/Spring Boot con formularios (búsqueda, carrito, checkout) que actualmente no tiene ninguna protección a nivel de red contra ataques web. ModSecurity agregaría esa capa de defensa perimetral. Para la demo, el aporte es especialmente visual: se puede mostrar el mismo ataque antes y después del WAF — primero el <code>&lt;script&gt;</code> llega a la app, luego con ModSecurity activo es cortado con 403 y queda registrado en los logs.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T10 -->
+  <div class="topic-card" id="t10">
+    <div class="topic-header" onclick="toggle(this)">
+      <span class="topic-number">10</span>
+      <div class="topic-meta">
+        <div class="topic-title">Security Scanning</div>
+        <div class="topic-tech">OpenVAS · Greenbone GSE · GVM-Tools · ospd-openvas</div>
+      </div>
+      <div class="topic-badges">
+        <span class="badge badge-3">Complejidad: Media</span>
+        <span class="badge badge-35">Industria: Media-Alta</span>
+        <span class="badge badge-3">Utilidad: Media</span>
+      </div>
+      <span class="topic-chevron">▾</span>
+    </div>
+    <div class="topic-body">
+      <div class="topic-grid">
+        <div class="topic-section">
+          <h4>¿De qué trata?</h4>
+          <p>Un escáner de vulnerabilidades analiza sistemas buscando debilidades conocidas: puertos abiertos con servicios vulnerables, versiones de software con CVEs conocidos, configuraciones inseguras. OpenVAS/Greenbone es el estándar open source para este tipo de auditoría. Es lo que usaría un pentester o equipo de seguridad antes de poner un sistema en producción.</p>
+        </div>
+        <div class="topic-section">
+          <h4>Plan Básico</h4>
+          <ul>
+            <li>Desplegar Greenbone/OpenVAS en una VM separada (~4GB RAM mínimo)</li>
+            <li>Configurar GVM-Tools para automatizar los escaneos via CLI</li>
+            <li>Apuntar el escáner contra los servicios expuestos del cluster de The Store</li>
+            <li>Ejecutar un escaneo completo y analizar el reporte: CVEs, severidad, recomendaciones</li>
+            <li>Demostrar cómo actualizar una imagen reduce la cantidad de vulnerabilidades</li>
+          </ul>
+        </div>
+        <div class="topic-section">
+          <h4>Ejemplo Concreto</h4>
+          <div class="example-box">
+            OpenVAS escanea el cluster y detecta que la imagen de <code>catalog</code> usa una versión de Go con una CVE conocida de severidad media, y que Redis está accesible sin autenticación. El reporte muestra exactamente qué parchear — antes del scan nadie sabía que Redis estaba expuesto.
+          </div>
+        </div>
+        <div class="topic-section">
+          <h4>Utilidad Personal</h4>
+          <div class="util-row"><span class="badge badge-3">Media</span></div>
+          <p style="margin-top:10px;">Saber que existen herramientas de scanning y haber corrido una aunque sea una vez te cambia la perspectiva sobre la seguridad. Para proyectos propios, herramientas como Trivy (escaneo de imágenes Docker) o Snyk son más accesibles y se integran directo en el pipeline de CI/CD — y son mucho más usadas en el día a día de desarrollo moderno que OpenVAS.</p>
+        </div>
+        <div class="topic-section full">
+          <h4>Aporte al Proyecto The Store</h4>
+          <div class="aporte-box">
+            The Store tiene 5 servicios con imágenes Docker que nunca fueron auditadas en términos de seguridad. Un escaneo con OpenVAS revelaría el estado real del proyecto: CVEs en las versiones de Java, Go o Node.js usadas, configuraciones expuestas innecesariamente, puertos abiertos que no deberían estarlo. El aporte más valioso para la demo sería mostrar el ciclo completo: escaneo inicial → reporte con vulnerabilidades → aplicar un fix (actualizar una imagen) → segundo escaneo mostrando que las vulnerabilidades desaparecieron.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  ITBA · Redes de Información · 1C 2026 · The Store TPE Guide
+</footer>
+
+<script>
+  function toggle(header) {
+    const card = header.parentElement;
+    card.classList.toggle('open');
+  }
+
+  function jumpTo(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // open the card
+    if (!el.classList.contains('open')) {
+      el.classList.add('open');
+    }
+    // flash border
+    el.style.borderColor = 'rgba(0,212,255,0.6)';
+    setTimeout(() => { el.style.borderColor = ''; }, 800);
+  }
+
+  // Animate cards into view on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.05 });
+
+  document.querySelectorAll('.topic-card, .qcard').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(12px)';
+    el.style.transition = 'opacity 0.4s ease, transform 0.4s ease, border-color 0.3s';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
