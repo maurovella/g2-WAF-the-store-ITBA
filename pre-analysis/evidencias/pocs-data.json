@@ -1,0 +1,144 @@
+{
+  "audit_metadata": {
+    "timestamp": "2026-04-16T21:49:01Z",
+    "target": "http://localhost",
+    "tool": "Claude Cowork live audit + JS fetch in DevTools",
+    "session": "TPE Protección de Servicios con WAF · ITBA · 1C 2026",
+    "pre_waf_baseline": true,
+    "total_pocs": 10,
+    "vulnerable_count": 10,
+    "blocked_count": 0,
+    "bytes_leaked_total": 53561
+  },
+  "stacks_confirmed": {
+    "ui": "Spring Boot 3 (Webflux) — main_application_class=com.amazon.sample.ui.UiApplication",
+    "carts": "Spring Boot — formato de error con timestamp/requestId",
+    "orders": "Spring Boot — formato de error con timestamp/requestId",
+    "checkout": "NestJS sobre Express — header x-powered-by: Express",
+    "catalog": "Go / Gin — inferido por respuestas '404 page not found'"
+  },
+  "results": [
+    {
+      "id": "PoC1-Prometheus-leak",
+      "url": "/actuator/prometheus",
+      "method": "GET",
+      "status": 200,
+      "bytes": 26778,
+      "verdict": "vuln",
+      "category": "Information Disclosure",
+      "severity": "HIGH",
+      "owasp_top10_2025": "A05 Security Misconfiguration",
+      "crs_mitigation": "custom rule id:9001 deny on /actuator/prometheus"
+    },
+    {
+      "id": "PoC2-Actuator-health",
+      "url": "/actuator/health",
+      "method": "GET",
+      "status": 200,
+      "bytes": 49,
+      "verdict": "vuln",
+      "category": "Information Disclosure",
+      "severity": "MEDIUM",
+      "owasp_top10_2025": "A05 Security Misconfiguration",
+      "crs_mitigation": "custom rule allow only kube-probe UA from pod CIDR"
+    },
+    {
+      "id": "PoC3-Actuator-info",
+      "url": "/actuator/info",
+      "method": "GET",
+      "status": 200,
+      "bytes": 2,
+      "verdict": "vuln",
+      "category": "Stack Detection",
+      "severity": "LOW",
+      "owasp_top10_2025": "A05 Security Misconfiguration",
+      "crs_mitigation": "custom rule id:9001 deny on /actuator/*"
+    },
+    {
+      "id": "PoC4-Actuator-metrics",
+      "url": "/actuator/metrics",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1006,
+      "verdict": "vuln",
+      "category": "Information Disclosure",
+      "severity": "MEDIUM",
+      "owasp_top10_2025": "A05 Security Misconfiguration",
+      "crs_mitigation": "custom rule id:9001 deny on /actuator/*"
+    },
+    {
+      "id": "PoC5-IDOR-cart-admin",
+      "url": "/proxy/carts/admin",
+      "method": "GET",
+      "status": 200,
+      "bytes": 33,
+      "verdict": "vuln",
+      "category": "IDOR + SSRF",
+      "severity": "CRITICAL",
+      "owasp_top10_2025": "A01 Broken Access Control",
+      "crs_mitigation": "custom rule deny /proxy/carts/* without Authorization header"
+    },
+    {
+      "id": "PoC6-IDOR-cart-test",
+      "url": "/proxy/carts/test",
+      "method": "GET",
+      "status": 200,
+      "bytes": 32,
+      "verdict": "vuln",
+      "category": "IDOR + SSRF",
+      "severity": "CRITICAL",
+      "owasp_top10_2025": "A01 Broken Access Control",
+      "crs_mitigation": "idem PoC5"
+    },
+    {
+      "id": "PoC7-Traversal-actuator-info",
+      "url": "/proxy/catalog/../../actuator/info",
+      "method": "GET",
+      "status": 200,
+      "bytes": 2,
+      "verdict": "vuln",
+      "category": "Path Traversal + SSRF",
+      "severity": "CRITICAL",
+      "owasp_top10_2025": "A03 Injection / A10 SSRF",
+      "crs_mitigation": "OWASP CRS family 930xxx (LFI/path traversal)"
+    },
+    {
+      "id": "PoC8-Traversal-actuator-prom",
+      "url": "/proxy/catalog/../../actuator/prometheus",
+      "method": "GET",
+      "status": 200,
+      "bytes": 26785,
+      "verdict": "vuln",
+      "category": "Path Traversal + Information Disclosure",
+      "severity": "CRITICAL",
+      "owasp_top10_2025": "A03 Injection / A10 SSRF",
+      "crs_mitigation": "OWASP CRS family 930xxx + custom 9001"
+    },
+    {
+      "id": "PoC9-SSRF-orders-backend",
+      "url": "/proxy/orders/anything",
+      "method": "GET",
+      "status": 404,
+      "bytes": 104,
+      "verdict": "vuln",
+      "category": "SSRF (backend reached)",
+      "severity": "HIGH",
+      "note": "404 is from backend, NOT from proxy — confirms reachability",
+      "owasp_top10_2025": "A10 SSRF",
+      "crs_mitigation": "custom rule deny /proxy/(orders|checkout)/* without auth"
+    },
+    {
+      "id": "PoC10-SSRF-checkout-backend",
+      "url": "/proxy/checkout/anything",
+      "method": "GET",
+      "status": 404,
+      "bytes": 69,
+      "verdict": "vuln",
+      "category": "SSRF + Stack Disclosure",
+      "severity": "HIGH",
+      "note": "x-powered-by: Express header reveals backend stack",
+      "owasp_top10_2025": "A05 + A10",
+      "crs_mitigation": "remove server identification headers + deny /proxy"
+    }
+  ]
+}

