@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Pre-entrega TPE Tema 9 · Protección de Servicios con WAF para The Store</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 16mm 15mm 16mm;
+    }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 11.8px;
+      line-height: 1.34;
+      color: #111827;
+      margin: 0;
+    }
+    h1 {
+      font-size: 20px;
+      text-align: center;
+      margin: 0 0 5px 0;
+    }
+    .meta {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 11px;
+    }
+    h2 {
+      font-size: 13px;
+      margin: 10px 0 5px 0;
+      border-bottom: 1px solid #cbd5e1;
+      padding-bottom: 2px;
+    }
+    h3 {
+      font-size: 11.5px;
+      margin: 7px 0 3px 0;
+    }
+    p {
+      margin: 4px 0;
+    }
+    ul {
+      margin: 4px 0 5px 20px;
+      padding: 0;
+    }
+    li {
+      margin: 0 0 3px 0;
+    }
+    code {
+      font-family: Consolas, monospace;
+      font-size: 10.5px;
+      background: #f3f4f6;
+      padding: 0 3px;
+      border-radius: 3px;
+    }
+    pre {
+      font-family: Consolas, monospace;
+      font-size: 10px;
+      line-height: 1.25;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 8px;
+      margin: 5px 0 8px 0;
+      white-space: pre;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 8px 0;
+      font-size: 10.5px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 5px 6px;
+      vertical-align: top;
+    }
+    th {
+      background: #dbeafe;
+      text-align: left;
+    }
+    .page {
+      break-after: page;
+      page-break-after: always;
+    }
+    .page:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+  </style>
+</head>
+<body>
+  <section class="page">
+  <h1>Pre-entrega TPE Tema 9 · Protección de Servicios con WAF para The Store</h1>
+  <div class="meta">
+      <div><strong>Tema 9 · Redes de Información · ITBA · 1C 2026</strong></div>
+      <div><strong>Grupo 2</strong></div>
+      <div>Integrantes:</div>
+      <div>Mauro Vella</div><div>Enrique Castillo - 68321</div><div>Federico Inti Garcia Lauberer - 61374</div>
+    </div>
+
+    <h2>1. Problemática y contexto</h2>
+    <ul><li>The Store corre sobre Kind/Kubernetes y expone solo la UI vía <code>ingress-nginx</code>; los demás microservicios permanecen detrás de <code>ClusterIP</code> y no deberían ser accesibles desde el exterior.</li><li>La auditoría pre-WAF realizada contra <code>http://localhost</code> confirmó 10 vectores explotables sin autenticación. Los más críticos son SSRF/path traversal vía <code>/proxy/**</code>, IDOR de lectura en <code>/proxy/carts/{customerId}</code> y exposición de Spring Actuator.</li><li>Hoy no hay rate limiting, scanner detection ni headers HTTP de seguridad. Esto deja abierta la puerta a enumeración, scraping, abuso automatizado, fuga de información operativa y reconocimiento previo a ataques más complejos.</li><li>El problema es transversal a una arquitectura multi-lenguaje. Corregir individualmente en Java, Go y Node.js requiere cambios distribuidos; un WAF permite aplicar una política unificada en el punto de entrada.</li></ul>
+    <h3>Hallazgos que motivan la solución</h3>
+    <table>
+      <thead>
+        <tr><th>ID</th><th>Hallazgo</th><th>Severidad</th><th>OWASP Top 10</th></tr>
+      </thead>
+      <tbody><tr><td>H1</td><td>SSRF + path traversal vía <code>/proxy/**</code></td><td>Crítica</td><td>A03 / A10</td></tr><tr><td>H2</td><td>IDOR de lectura en <code>/proxy/carts/{customerId}</code></td><td>Crítica</td><td>A01</td></tr><tr><td>H3</td><td>Spring Actuator expuesto (<code>info</code>, <code>health</code>, <code>metrics</code>, <code>prometheus</code>)</td><td>Alta</td><td>A05</td></tr><tr><td>H4</td><td>Sin rate limit ni scanner detection</td><td>Alta</td><td>A04</td></tr><tr><td>H5</td><td>Headers de seguridad ausentes</td><td>Media</td><td>A05</td></tr></tbody>
+    </table>
+  </section>
+
+  <section class="page">
+    <h2>2. Diseño de la solución</h2>
+    <ul><li>Se propone desplegar <code>ModSecurity v3</code> con <code>OWASP Core Rule Set (CRS)</code> dentro del <code>ingress-nginx-controller</code> ya presente en el cluster Kind.</li><li>La solución operará en dos etapas: <code>DetectionOnly</code> para tuning inicial y luego <code>On</code> para bloqueo efectivo, minimizando falsos positivos antes de la demo final.</li><li>Además del CRS base, se incluirán reglas custom para bloquear <code>/actuator/*</code> sensibles, negar traversal sobre <code>/proxy/**</code>, limitar abuso automatizado y reforzar headers de seguridad.</li><li>La principal ventaja es que no requiere cambios funcionales en los microservicios: el cambio queda acotado al Ingress, su ConfigMap y las reglas del WAF.</li></ul>
+    <h3>Componentes a implementar</h3>
+    <ul><li><strong>ConfigMap de `ingress-nginx`:</strong> Activar <code>enable-modsecurity</code>, CRS y <code>SecRuleEngine</code> en modo <code>DetectionOnly</code>/<code>On</code>.</li><li><strong>OWASP CRS:</strong> Cubrir traversal, scanners y payloads genéricos de capa 7 sin tocar el código de negocio.</li><li><strong>Reglas custom:</strong> Bloquear <code>/actuator/*</code>, traversal sobre <code>/proxy/**</code> y reforzar guardrails contextuales.</li><li><strong>Anotaciones del Ingress:</strong> Aplicar <code>limit-rps</code>, <code>limit-connections</code> y <code>more_set_headers</code> para hardening perimetral.</li></ul>
+
+    <h2>3. Scope del POC y casos de uso</h2>
+    <h3>Alcance comprometido</h3>
+    <ul><li><strong>Bloqueo de Actuator sensible:</strong> Requests a <code>/actuator/info</code>, <code>/actuator/metrics</code> y <code>/actuator/prometheus</code> deberán pasar de <code>200 OK</code> a <code>403 Forbidden</code>.</li><li><strong>Mitigación de SSRF/path traversal vía proxy:</strong> Payloads como <code>/proxy/catalog/../../actuator/prometheus</code> deberán quedar bloqueados por CRS 930xxx y/o regla custom específica.</li><li><strong>Detección de scanners conocidos:</strong> User-Agents de herramientas como Nikto o sqlmap deberán quedar registrados y bloqueados por reglas del CRS.</li><li><strong>Rate limiting en el punto de entrada:</strong> Se limitará el caudal por IP desde el Ingress para mitigar abuso automatizado y DoS de baja complejidad.</li><li><strong>Headers de seguridad HTTP:</strong> El Ingress agregará <code>HSTS</code>, <code>X-Frame-Options</code>, <code>X-Content-Type-Options</code>, <code>Content-Security-Policy</code>, <code>Referrer-Policy</code> y <code>Permissions-Policy</code>.</li></ul>
+  </section>
+
+  <section class="page">
+    <h2>3. Scope del POC y casos de uso</h2>
+    <h3>Casos de uso para la demo</h3>
+    <ul><li>Antes/después de exfiltración de métricas vía <code>/actuator/prometheus</code>.</li><li>Antes/después de traversal vía <code>/proxy/catalog/../../actuator/info</code>.</li><li>Request con User-Agent de Nikto antes/después del WAF.</li><li>Burst de requests para mostrar ausencia/presencia de rate limiting.</li><li>Comparación de headers de respuesta de la home antes/después.</li></ul>
+
+    <h2>4. Diagrama de arquitectura</h2>
+    <pre>Internet / Host (127.0.0.1:80,443)
+        │
+        ▼
+Kind single-node · Ubuntu 22.04 base · HTTP/1.1
+        │
+        ▼
+Namespace ingress-nginx
+  ingress-nginx-controller
+  + Nginx
+  + libmodsecurity v3
+  + OWASP CRS
+        │
+        ▼
+Ingress host=localhost path=/  ─────────────►  ui:80
+                                              │
+                                              ├──► catalog:80
+                                              ├──► carts:80
+                                              ├──► checkout:80
+                                              └──► orders:80
+</pre>
+    <table>
+      <thead><tr><th>Bloque</th><th>CIDR</th><th>Rol</th></tr></thead>
+      <tbody><tr><td>Host loopback</td><td><code>127.0.0.1/32</code></td><td>Usuario accede a The Store por 80/443</td></tr><tr><td>Docker / nodo Kind</td><td><code>172.18.0.0/16</code></td><td>Red del contenedor del nodo</td></tr><tr><td>Pods</td><td><code>10.244.0.0/16</code></td><td>Comunicación entre pods</td></tr><tr><td>Services</td><td><code>10.96.0.0/12</code></td><td>ClusterIP internos</td></tr></tbody>
+    </table>
+    <ul>
+      <li><strong>SO base del nodo:</strong> <code>kindest/node</code> sobre Ubuntu 22.04.</li>
+      <li><strong>Protocolos:</strong> HTTP/1.1 externo e interno; DNS interno de Kubernetes.</li>
+      <li><strong>Punto de inserción del WAF:</strong> <code>ingress-nginx-controller</code> en el namespace <code>ingress-nginx</code>.</li>
+      <li><strong>Cambios esperados:</strong> ConfigMap, reglas ModSecurity/CRS y anotaciones del Ingress principal.</li>
+    </ul>
+  </section>
+
+  <section class="page">
+    <h2>5. Alternativas consideradas</h2>
+    <ul><li><strong>Shadow Daemon:</strong> Se descarta porque exige instrumentación más cercana a la aplicación y no encaja naturalmente con una arquitectura Java/Go/Node detrás de un Ingress compartido.</li><li><strong>OpenWAF:</strong> Fue considerado por figurar en el enunciado, pero se evita por menor madurez de ecosistema y menor predictibilidad para una demo académica.</li><li><strong>Coraza:</strong> Es técnicamente interesante y compatible con CRS, pero no figura en el tema asignado; se deja como evolución futura.</li></ul>
+
+    <h2>6. Plan breve de validación</h2>
+    <ul><li>Usar como baseline la evidencia pre-WAF ya capturada en <code>pre-analysis/evidencias/</code>.</li><li>Repetir los PoCs seleccionados con <code>DetectionOnly</code> y luego con bloqueo activo.</li><li>Guardar snapshot post-WAF y comparar resultados pre/post con un diff simple.</li><li>Adjuntar logs de ModSecurity para demostrar que el bloqueo provino del WAF.</li></ul>
+    <h3>Métricas esperadas del antes/después</h3>
+    <table>
+      <thead><tr><th>Métrica</th><th>Pre-WAF</th><th>Post-WAF esperado</th></tr></thead>
+      <tbody><tr><td>/actuator/prometheus</td><td>200 OK</td><td>403 Forbidden</td></tr><tr><td>Traversal vía /proxy/**</td><td>explotable</td><td>bloqueado</td></tr><tr><td>User-Agent Nikto/sqlmap</td><td>permitido</td><td>detectado/bloqueado</td></tr><tr><td>Rate limit</td><td>no presente</td><td>activo en el Ingress</td></tr><tr><td>Headers de seguridad</td><td>0/6</td><td>6/6</td></tr></tbody>
+    </table>
+
+    <h2>7. Riesgos y mitigaciones</h2>
+    <ul><li><strong>Falsos positivos del CRS:</strong> Arrancar en <code>DetectionOnly</code>, revisar logs y excluir reglas puntuales solo si afectan tráfico legítimo.</li><li><strong>Bloqueo insuficiente de vectores propios de la app:</strong> Complementar el CRS con reglas custom centradas en <code>/actuator/*</code> y <code>/proxy/**</code>.</li><li><strong>Dependencia del Ingress como punto único:</strong> Mantener cambios acotados y reproducibles en manifests para poder iterar rápido.</li></ul>
+
+    <h2>8. Cronograma resumido</h2>
+    <ul><li><strong>Semana 1:</strong> Validar pre-entrega y congelar alcance definitivo del POC.</li><li><strong>Semana 2:</strong> Desplegar ModSecurity + CRS sobre <code>ingress-nginx</code> en el cluster local.</li><li><strong>Semana 3:</strong> Implementar reglas custom y tunear falsos positivos.</li><li><strong>Semana 4:</strong> Generar baseline post-WAF, diff de resultados y material para la demo final.</li></ul>
+
+    <h2>9. Criterio de éxito</h2>
+    <p>Se considerará cumplido el POC si los vectores hoy explotables en el punto de entrada HTTP quedan detectados o bloqueados por el WAF, sin romper el acceso normal a la home, catálogo, carrito y checkout. La entrega final incluirá demo funcional, código en GitHub y how-to de despliegue.</p>
+  </section>
+</body>
+</html>
