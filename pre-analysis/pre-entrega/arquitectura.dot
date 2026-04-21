@@ -1,0 +1,99 @@
+digraph arquitectura {
+    // ====== Canvas ======
+    graph [
+        rankdir=TB,
+        bgcolor="white",
+        fontname="Helvetica",
+        fontsize=11,
+        pad=0.3,
+        nodesep=0.4,
+        ranksep=0.55,
+        splines=true
+    ];
+    node [fontname="Helvetica", fontsize=10, style="filled,rounded", shape=box, penwidth=1.4];
+    edge [fontname="Helvetica", fontsize=9, color="#374151", penwidth=1.2];
+
+    // ====== Usuario / Internet ======
+    internet [
+        label=< <B>Usuario · Internet</B><BR/>127.0.0.1 : 80 / 443<BR/>HTTP / HTTPS >,
+        fillcolor="#fef3c7", color="#b45309"
+    ];
+
+    // ====== Cluster Kind ======
+    subgraph cluster_kind {
+        label=<<B>Nodo Kind · Ubuntu 22.04 · Docker bridge 172.18.0.0/16</B>>;
+        labeljust="l";
+        labelloc="t";
+        fontsize=10;
+        style="rounded,filled";
+        fillcolor="#f9fafb";
+        color="#9ca3af";
+        margin=12;
+
+        // ====== Namespace ingress-nginx ======
+        subgraph cluster_ns_ingress {
+            label=<<B>Namespace:</B> ingress-nginx>;
+            labeljust="l";
+            fontsize=9;
+            style="rounded,filled";
+            fillcolor="#fee2e2";
+            color="#b91c1c";
+            margin=10;
+
+            waf [
+                label=< <B>ingress-nginx-controller</B><BR/>Nginx + libmodsecurity v3<BR/>+ OWASP Core Rule Set<BR/>+ reglas custom del grupo<BR/><FONT POINT-SIZE="8">Ingress: host=localhost &nbsp; path=/</FONT> >,
+                fillcolor="#fca5a5", color="#991b1b"
+            ];
+        }
+
+        // ====== Namespace the-store ======
+        subgraph cluster_ns_store {
+            label=<<B>Namespace:</B> the-store &nbsp; | &nbsp; Services 10.96.0.0/12 &nbsp; | &nbsp; Pods 10.244.0.0/16>;
+            labeljust="l";
+            fontsize=9;
+            style="rounded,filled";
+            fillcolor="#dbeafe";
+            color="#1d4ed8";
+            margin=10;
+
+            ui [
+                label=< <B>ui</B><BR/>Java · Spring Boot 3<BR/>ClusterIP : 80 >,
+                fillcolor="#bfdbfe", color="#1e40af"
+            ];
+
+            // Subgrafo backends
+            subgraph cluster_backends {
+                label=<<B>Backends</B> (no accesibles desde Internet por diseño)>;
+                labeljust="l";
+                fontsize=9;
+                style="rounded,filled";
+                fillcolor="#dcfce7";
+                color="#166534";
+                margin=8;
+
+                catalog [label=< <B>catalog</B><BR/>Go · Gin<BR/>ClusterIP : 80 >, fillcolor="#bbf7d0", color="#15803d"];
+                carts   [label=< <B>carts</B><BR/>Java · Spring Boot<BR/>ClusterIP : 80 >, fillcolor="#bbf7d0", color="#15803d"];
+                orders  [label=< <B>orders</B><BR/>Java · Spring Boot<BR/>ClusterIP : 80 >, fillcolor="#bbf7d0", color="#15803d"];
+                checkout[label=< <B>checkout</B><BR/>Node · NestJS<BR/>ClusterIP : 80 >, fillcolor="#bbf7d0", color="#15803d"];
+
+                // Alineación horizontal
+                {rank=same; catalog; carts; orders; checkout;}
+            }
+        }
+    }
+
+    // ====== Log de auditoría ======
+    logs [
+        label=< <I>modsec_audit.log</I><BR/><FONT POINT-SIZE="8">bitácora de ataques</FONT> >,
+        fillcolor="#f3f4f6", color="#6b7280", style="rounded,filled,dashed"
+    ];
+
+    // ====== Flechas ======
+    internet -> waf [label="  HTTP/HTTPS  ", color="#b45309", fontcolor="#b45309"];
+    waf -> ui [label="  solo requests limpias  ", color="#059669", fontcolor="#059669", penwidth=1.6];
+    ui -> catalog  [label="HTTP interno", fontsize=8];
+    ui -> carts    [label="HTTP interno", fontsize=8];
+    ui -> orders   [label="HTTP interno", fontsize=8];
+    ui -> checkout [label="HTTP interno", fontsize=8];
+    waf -> logs [label="registra", color="#6b7280", fontcolor="#6b7280", style="dashed"];
+}
