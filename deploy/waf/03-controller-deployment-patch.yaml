@@ -1,0 +1,35 @@
+# =============================================================================
+# Patch del Deployment ingress-nginx-controller · monta las reglas custom
+# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# =============================================================================
+#
+# Strategic-merge patch que agrega:
+#   - un volumen `modsec-custom-rules` desde la ConfigMap homónima
+#   - un volumeMount en /etc/nginx/modsecurity-custom/ (readOnly)
+#
+# La ConfigMap `modsec-custom-rules` se genera en install.sh a partir de
+# deploy/waf/rules/the-store.conf (kubectl create configmap --from-file).
+#
+# El `modsecurity-snippet` del controller hace `Include` de ese path.
+#
+# Se aplica con:
+#   kubectl -n ingress-nginx patch deployment ingress-nginx-controller \
+#     --patch-file deploy/waf/03-controller-deployment-patch.yaml
+#
+# Las listas usan merge-keys (volumes→name, volumeMounts→mountPath,
+# containers→name) así que esto AGREGA sin pisar el volumen webhook-cert
+# ni el mount de certificados que ya trae el controller.
+# =============================================================================
+spec:
+  template:
+    spec:
+      containers:
+        - name: controller
+          volumeMounts:
+            - name: modsec-custom-rules
+              mountPath: /etc/nginx/modsecurity-custom
+              readOnly: true
+      volumes:
+        - name: modsec-custom-rules
+          configMap:
+            name: modsec-custom-rules

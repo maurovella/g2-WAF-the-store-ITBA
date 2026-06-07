@@ -1,0 +1,1379 @@
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:44 +0000] 17808673644.794001 172.20.0.1 53514 10.244.0.16 80
+---EBnvOgO2---B--
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/prometheus"] [unique_id "17808673644.794001"] [ref "o0,20o10,10v4,20"]
+
+---EBnvOgO2---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:44 +0000] 17808673644.408959 172.20.0.1 53520 10.244.0.16 80
+---EBnvOgO2---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: sqlmap/1.7.2
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `sqlmap/1.7.2' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: sqlmap/1.7.2"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "17808673644.408959"] [ref "o0,6v43,12"]
+
+---EBnvOgO2---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:56 +0000] 178086737673.157641 172.20.0.1 39044 10.244.0.16 80
+---EBnvOgO2---B--
+GET /proxy/carts/actuator/health HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)^/proxy/[^/]+/(?:actuator|debug|management|admin)\b' against variable `REQUEST_URI' (Value: `/proxy/carts/actuator/health' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "38"] [id "99003"] [rev ""] [msg "WAF-TS-99003 Acceso a ruta administrativa de backend via proxy bloqueado"] [data ""] [severity "3"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H1-backend-admin-via-proxy"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/proxy/carts/actuator/health"] [unique_id "178086737673.157641"] [ref "o0,21v4,28"]
+
+---EBnvOgO2---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:56 +0000] 178086737651.833799 172.20.0.1 39046 10.244.0.16 80
+---EBnvOgO2---B--
+GET /proxy/orders/%2e%2e%2f%2e%2e%2factuator%2finfo HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/proxy/orders/../../actuator/info' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/proxy/orders/../../actuator/info"] [unique_id "178086737651.833799"] [ref "o19,14o29,4v4,47"]
+
+---EBnvOgO2---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:57 +0000] 178086737760.523500 172.20.0.1 39048 10.244.0.16 80
+---EBnvOgO2---B--
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/prometheus"] [unique_id "178086737760.523500"] [ref "o0,20o10,10v4,20"]
+
+---EBnvOgO2---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:57 +0000] 178086737741.018359 172.20.0.1 39062 10.244.0.16 80
+---EBnvOgO2---B--
+POST /checkout HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+Content-Length: 132
+Content-Type: application/x-www-form-urlencoded
+
+---EBnvOgO2---C--
+firstName=%3Cscript%3Ealert%281%29%3C%2Fscript%3E&lastName=Doe&email=a%40b.com&address1=100+Main&city=Anytown&state=CA&zipCode=11111
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 146
+Date: Sun, 07 Jun 2026 21:22:57 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---EBnvOgO2---H--
+ModSecurity: Warning. detected XSS using libinjection. [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "83"] [id "941100"] [rev ""] [msg "XSS Attack Detected via libinjection"] [data "Matched Data: XSS data found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737741.018359"] [ref "v155,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)<script[^>]*>[\s\S]*?' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "110"] [id "941110"] [rev ""] [msg "XSS Filter - Category 1: Script Tag Vector"] [data "Matched Data: <script> found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737741.018359"] [ref "o0,8v155,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)<[^0-9<>A-Z_a-z]*(?:[^\s\x0b\"'<>]*:)?[^0-9<>A-Z_a-z]*[^0-9A-Z_a-z]*?(?:s[^0-9A-Z_a-z]*?(?:c[^0-9A-Z_a-z]*?r[^0-9A-Z_a-z]*?i[^0-9A-Z_a-z]*?p[^0-9A-Z_a-z]*?t|t[^0-9A-Z_a-z]*?y[^0-9A-Z_a-z]*?l[^0-9A (4378 characters omitted)' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "205"] [id "941160"] [rev ""] [msg "NoScript XSS InjectionChecker: HTML Injection"] [data "Matched Data: <script found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737741.018359"] [ref "o0,7v155,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)\b(?:eval|set(?:timeout|interval)|new[\s\x0b]+Function|a(?:lert|tob)|btoa|(?:promp|impor)t|con(?:firm|sole\.(?:log|dir))|fetch)[\s\x0b]*[\(\{]' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "739"] [id "941390"] [rev ""] [msg "Javascript method detected"] [data "Matched Data: alert( found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737741.018359"] [ref "o8,6v155,25t:htmlEntityDecode,t:jsDecode"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `20' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 20)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737741.018359"] [ref ""]
+
+---EBnvOgO2---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:22:57 +0000] 178086737764.630198 172.20.0.1 39076 10.244.0.16 80
+---GGCGoDG6---B--
+POST /checkout HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+Content-Length: 128
+Content-Type: application/x-www-form-urlencoded
+
+---GGCGoDG6---C--
+firstName=Robert%27%29%3B+DROP+TABLE+addresses%3B--&lastName=Doe&email=a%40b.com&address1=100+Main&city=A&state=CA&zipCode=11111
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 146
+Date: Sun, 07 Jun 2026 21:22:57 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---GGCGoDG6---H--
+ModSecurity: Warning. detected SQLi using libinjection. [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf"] [line "46"] [id "942100"] [rev ""] [msg "SQL Injection Attack Detected via libinjection"] [data "Matched Data: s);Tn found within ARGS:firstName: Robert'); DROP TABLE addresses;--"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-sqli"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-SQLI"] [tag "capec/1000/152/248/66"] [tag "PCI/6.5.2"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737764.630198"] [ref "v155,33"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)create[\s\x0b]+function[\s\x0b].+[\s\x0b]returns|;[\s\x0b]*?(?:alter|(?:(?:cre|trunc|upd)at|renam)e|d(?:e(?:lete|sc)|rop)|(?:inser|selec)t|load)\b[\s\x0b]*?[\(\[]?[0-9A-Z_a-z]{2,}' against variable `ARGS:firstName' (Value: `Robert'); DROP TABLE addresses;--' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf"] [line "445"] [id "942350"] [rev ""] [msg "Detects MySQL UDF injection and other data/structure manipulation attempts"] [data "Matched Data: ; DROP TABLE found within ARGS:firstName: Robert'); DROP TABLE addresses;--"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-sqli"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-SQLI"] [tag "capec/1000/152/248/66"] [tag "PCI/6.5.2"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737764.630198"] [ref "o8,12v155,33t:urlDecodeUni"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `10' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 10)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086737764.630198"] [ref ""]
+
+---GGCGoDG6---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:22:57 +0000] 178086737757.521703 172.20.0.1 39090 10.244.0.16 80
+---GGCGoDG6---B--
+GET /actuator/info HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/info' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/info"] [unique_id "178086737757.521703"] [ref "o0,14o10,4v4,14"]
+
+---GGCGoDG6---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:22:57 +0000] 17808673770.474688 172.20.0.1 39100 10.244.0.16 80
+---GGCGoDG6---B--
+GET /actuator/metrics HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/metrics' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/metrics"] [unique_id "17808673770.474688"] [ref "o0,17o10,7v4,17"]
+
+---GGCGoDG6---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:22:57 +0000] 17808673770.438410 172.20.0.1 39106 10.244.0.16 80
+---CJ31I2JE---B--
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 403
+
+---CJ31I2JE---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/prometheus"] [unique_id "17808673770.438410"] [ref "o0,20o10,10v4,20"]
+
+---CJ31I2JE---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:57 +0000] 178086737751.044289 172.20.0.1 39110 10.244.0.16 80
+---EBnvOgO2---B--
+GET /actuator/env HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/env' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/env"] [unique_id "178086737751.044289"] [ref "o0,13o10,3v4,13"]
+
+---EBnvOgO2---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:22:57 +0000] 178086737731.050860 172.20.0.1 39116 10.244.0.16 80
+---GGCGoDG6---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.00 (Nikto/2.5.0)
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `Mozilla/5.00 (Nikto/2.5.0)' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: Mozilla/5.00 (Nikto/2.5.0)"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086737731.050860"] [ref "o14,5v43,26"]
+
+---GGCGoDG6---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:22:57 +0000] 178086737790.954425 172.20.0.1 39118 10.244.0.16 80
+---GGCGoDG6---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: sqlmap/1.7.2#stable (https://sqlmap.org)
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `sqlmap/1.7.2#stable (https://sqlmap.org)' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: sqlmap/1.7.2#stable (https://sqlmap.org)"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086737790.954425"] [ref "o0,6v43,40"]
+
+---GGCGoDG6---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:22:57 +0000] 178086737750.996815 172.20.0.1 39128 10.244.0.16 80
+---EBnvOgO2---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: Nuclei - Open-source project (github.com/projectdiscovery/nuclei)
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `Nuclei - Open-source project (github.com/projectdiscovery/nuclei)' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: Nuclei - Open-source project (github.com/projectdiscovery/nuclei)"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086737750.996815"] [ref "o0,6v43,65"]
+
+---EBnvOgO2---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:24:34 +0000] 178086747466.023824 172.20.0.1 43492 10.244.0.16 80
+---GGCGoDG6---B--
+GET /proxy/catalog/../../debug/pprof/ HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)^/proxy/.+/(?:\.\.|%2e%2e|%252e%252e)' against variable `REQUEST_URI' (Value: `/proxy/catalog/../../debug/pprof/' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "33"] [id "99002"] [rev ""] [msg "WAF-TS-99002 Path traversal bloqueado en endpoint /proxy/*"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H1-proxy-traversal"] [tag "OWASP_CRS"] [tag "attack-lfi"] [tag "attack-ssrf"] [tag "CWE-22"] [tag "CWE-918"] [hostname "localhost"] [uri "/proxy/catalog/../../debug/pprof/"] [unique_id "178086747466.023824"] [ref "o0,20v4,33"]
+
+---GGCGoDG6---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:34 +0000] 178086747454.770130 172.20.0.1 43506 10.244.0.16 80
+---CJ31I2JE---B--
+GET /proxy/carts/actuator/health HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 403
+
+---CJ31I2JE---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)^/proxy/[^/]+/(?:actuator|debug|management|admin)\b' against variable `REQUEST_URI' (Value: `/proxy/carts/actuator/health' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "38"] [id "99003"] [rev ""] [msg "WAF-TS-99003 Acceso a ruta administrativa de backend via proxy bloqueado"] [data ""] [severity "3"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H1-backend-admin-via-proxy"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/proxy/carts/actuator/health"] [unique_id "178086747454.770130"] [ref "o0,21v4,28"]
+
+---CJ31I2JE---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:24:34 +0000] 17808674747.302205 172.20.0.1 43516 10.244.0.16 80
+---GGCGoDG6---B--
+GET /proxy/orders/%2e%2e%2f%2e%2e%2factuator%2finfo HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/proxy/orders/../../actuator/info' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/proxy/orders/../../actuator/info"] [unique_id "17808674747.302205"] [ref "o19,14o29,4v4,47"]
+
+---GGCGoDG6---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:34 +0000] 178086747463.068536 172.20.0.1 43522 10.244.0.16 80
+---CJ31I2JE---B--
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 403
+
+---CJ31I2JE---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/prometheus"] [unique_id "178086747463.068536"] [ref "o0,20o10,10v4,20"]
+
+---CJ31I2JE---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:24:34 +0000] 17808674742.675027 172.20.0.1 43528 10.244.0.16 80
+---D9wKUdmP---B--
+POST /checkout HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+Content-Length: 132
+Content-Type: application/x-www-form-urlencoded
+
+---D9wKUdmP---C--
+firstName=%3Cscript%3Ealert%281%29%3C%2Fscript%3E&lastName=Doe&email=a%40b.com&address1=100+Main&city=Anytown&state=CA&zipCode=11111
+
+---D9wKUdmP---F--
+HTTP/1.1 403
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 146
+Date: Sun, 07 Jun 2026 21:24:34 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---D9wKUdmP---H--
+ModSecurity: Warning. detected XSS using libinjection. [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "83"] [id "941100"] [rev ""] [msg "XSS Attack Detected via libinjection"] [data "Matched Data: XSS data found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "17808674742.675027"] [ref "v155,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)<script[^>]*>[\s\S]*?' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "110"] [id "941110"] [rev ""] [msg "XSS Filter - Category 1: Script Tag Vector"] [data "Matched Data: <script> found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "17808674742.675027"] [ref "o0,8v155,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)<[^0-9<>A-Z_a-z]*(?:[^\s\x0b\"'<>]*:)?[^0-9<>A-Z_a-z]*[^0-9A-Z_a-z]*?(?:s[^0-9A-Z_a-z]*?(?:c[^0-9A-Z_a-z]*?r[^0-9A-Z_a-z]*?i[^0-9A-Z_a-z]*?p[^0-9A-Z_a-z]*?t|t[^0-9A-Z_a-z]*?y[^0-9A-Z_a-z]*?l[^0-9A (4378 characters omitted)' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "205"] [id "941160"] [rev ""] [msg "NoScript XSS InjectionChecker: HTML Injection"] [data "Matched Data: <script found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "17808674742.675027"] [ref "o0,7v155,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)\b(?:eval|set(?:timeout|interval)|new[\s\x0b]+Function|a(?:lert|tob)|btoa|(?:promp|impor)t|con(?:firm|sole\.(?:log|dir))|fetch)[\s\x0b]*[\(\{]' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "739"] [id "941390"] [rev ""] [msg "Javascript method detected"] [data "Matched Data: alert( found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "17808674742.675027"] [ref "o8,6v155,25t:htmlEntityDecode,t:jsDecode"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `20' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 20)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/checkout"] [unique_id "17808674742.675027"] [ref ""]
+
+---D9wKUdmP---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:24:34 +0000] 178086747422.667081 172.20.0.1 43544 10.244.0.16 80
+---EBnvOgO2---B--
+POST /checkout HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+Content-Length: 128
+Content-Type: application/x-www-form-urlencoded
+
+---EBnvOgO2---C--
+firstName=Robert%27%29%3B+DROP+TABLE+addresses%3B--&lastName=Doe&email=a%40b.com&address1=100+Main&city=A&state=CA&zipCode=11111
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 146
+Date: Sun, 07 Jun 2026 21:24:34 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---EBnvOgO2---H--
+ModSecurity: Warning. detected SQLi using libinjection. [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf"] [line "46"] [id "942100"] [rev ""] [msg "SQL Injection Attack Detected via libinjection"] [data "Matched Data: s);Tn found within ARGS:firstName: Robert'); DROP TABLE addresses;--"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-sqli"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-SQLI"] [tag "capec/1000/152/248/66"] [tag "PCI/6.5.2"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086747422.667081"] [ref "v155,33"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)create[\s\x0b]+function[\s\x0b].+[\s\x0b]returns|;[\s\x0b]*?(?:alter|(?:(?:cre|trunc|upd)at|renam)e|d(?:e(?:lete|sc)|rop)|(?:inser|selec)t|load)\b[\s\x0b]*?[\(\[]?[0-9A-Z_a-z]{2,}' against variable `ARGS:firstName' (Value: `Robert'); DROP TABLE addresses;--' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf"] [line "445"] [id "942350"] [rev ""] [msg "Detects MySQL UDF injection and other data/structure manipulation attempts"] [data "Matched Data: ; DROP TABLE found within ARGS:firstName: Robert'); DROP TABLE addresses;--"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-sqli"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-SQLI"] [tag "capec/1000/152/248/66"] [tag "PCI/6.5.2"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086747422.667081"] [ref "o8,12v155,33t:urlDecodeUni"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `10' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 10)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086747422.667081"] [ref ""]
+
+---EBnvOgO2---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:24:34 +0000] 178086747435.733254 172.20.0.1 43548 10.244.0.16 80
+---EBnvOgO2---B--
+GET /actuator/info HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/info' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/info"] [unique_id "178086747435.733254"] [ref "o0,14o10,4v4,14"]
+
+---EBnvOgO2---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:24:34 +0000] 178086747497.881203 172.20.0.1 43572 10.244.0.16 80
+---D9wKUdmP---B--
+GET /actuator/metrics HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 403
+
+---D9wKUdmP---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/metrics' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/metrics"] [unique_id "178086747497.881203"] [ref "o0,17o10,7v4,17"]
+
+---D9wKUdmP---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:24:34 +0000] 178086747448.186034 172.20.0.1 43580 10.244.0.16 80
+---D9wKUdmP---B--
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 403
+
+---D9wKUdmP---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/prometheus"] [unique_id "178086747448.186034"] [ref "o0,20o10,10v4,20"]
+
+---D9wKUdmP---Z--
+
+---8seQ4J8J---A--
+[07/Jun/2026:21:24:35 +0000] 178086747546.831044 172.20.0.1 43590 10.244.0.16 80
+---8seQ4J8J---B--
+GET /actuator/env HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---8seQ4J8J---F--
+HTTP/1.1 403
+
+---8seQ4J8J---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/env' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/env"] [unique_id "178086747546.831044"] [ref "o0,13o10,3v4,13"]
+
+---8seQ4J8J---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:24:35 +0000] 178086747521.579078 172.20.0.1 43592 10.244.0.16 80
+---EBnvOgO2---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.00 (Nikto/2.5.0)
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 403
+
+---EBnvOgO2---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `Mozilla/5.00 (Nikto/2.5.0)' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: Mozilla/5.00 (Nikto/2.5.0)"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086747521.579078"] [ref "o14,5v43,26"]
+
+---EBnvOgO2---Z--
+
+---8seQ4J8J---A--
+[07/Jun/2026:21:24:35 +0000] 178086747546.654768 172.20.0.1 43608 10.244.0.16 80
+---8seQ4J8J---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: sqlmap/1.7.2#stable (https://sqlmap.org)
+Accept: */*
+
+---8seQ4J8J---F--
+HTTP/1.1 403
+
+---8seQ4J8J---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `sqlmap/1.7.2#stable (https://sqlmap.org)' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: sqlmap/1.7.2#stable (https://sqlmap.org)"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086747546.654768"] [ref "o0,6v43,40"]
+
+---8seQ4J8J---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:24:35 +0000] 178086747571.543158 172.20.0.1 43610 10.244.0.16 80
+---GGCGoDG6---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: Nuclei - Open-source project (github.com/projectdiscovery/nuclei)
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `Nuclei - Open-source project (github.com/projectdiscovery/nuclei)' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: Nuclei - Open-source project (github.com/projectdiscovery/nuclei)"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086747571.543158"] [ref "o0,6v43,65"]
+
+---GGCGoDG6---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:38 +0000] 178086747895.337637 172.20.0.1 44132 10.244.0.16 80
+---CJ31I2JE---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---CJ31I2JE---H--
+
+---CJ31I2JE---Z--
+
+---8seQ4J8J---A--
+[07/Jun/2026:21:24:38 +0000] 178086747821.513426 172.20.0.1 44148 10.244.0.16 80
+---8seQ4J8J---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---8seQ4J8J---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---8seQ4J8J---H--
+
+---8seQ4J8J---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:38 +0000] 178086747897.230110 172.20.0.1 44178 10.244.0.16 80
+---CJ31I2JE---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---CJ31I2JE---H--
+
+---CJ31I2JE---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:24:38 +0000] 178086747850.491786 172.20.0.1 44194 10.244.0.16 80
+---GGCGoDG6---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---GGCGoDG6---H--
+
+---GGCGoDG6---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:38 +0000] 178086747839.483847 172.20.0.1 44204 10.244.0.16 80
+---CJ31I2JE---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---CJ31I2JE---H--
+
+---CJ31I2JE---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:38 +0000] 178086747824.340855 172.20.0.1 44220 10.244.0.16 80
+---CJ31I2JE---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---CJ31I2JE---H--
+
+---CJ31I2JE---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:24:38 +0000] 178086747861.701514 172.20.0.1 44230 10.244.0.16 80
+---D9wKUdmP---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---D9wKUdmP---H--
+
+---D9wKUdmP---Z--
+
+---2ue1j3U1---A--
+[07/Jun/2026:21:24:38 +0000] 178086747814.046726 172.20.0.1 44234 10.244.0.16 80
+---2ue1j3U1---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---2ue1j3U1---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---2ue1j3U1---H--
+
+---2ue1j3U1---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:38 +0000] 178086747864.741372 172.20.0.1 44254 10.244.0.16 80
+---CJ31I2JE---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---CJ31I2JE---H--
+
+---CJ31I2JE---Z--
+
+---WmvhX81h---A--
+[07/Jun/2026:21:24:38 +0000] 178086747862.702539 172.20.0.1 44262 10.244.0.16 80
+---WmvhX81h---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---WmvhX81h---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---WmvhX81h---H--
+
+---WmvhX81h---Z--
+
+---2ue1j3U1---A--
+[07/Jun/2026:21:24:38 +0000] 178086747894.045563 172.20.0.1 44280 10.244.0.16 80
+---2ue1j3U1---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---2ue1j3U1---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---2ue1j3U1---H--
+
+---2ue1j3U1---Z--
+
+---2ue1j3U1---A--
+[07/Jun/2026:21:24:38 +0000] 178086747869.311861 172.20.0.1 44288 10.244.0.16 80
+---2ue1j3U1---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---2ue1j3U1---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:38 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---2ue1j3U1---H--
+
+---2ue1j3U1---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:24:39 +0000] 178086747935.227344 172.20.0.1 44312 10.244.0.16 80
+---D9wKUdmP---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---D9wKUdmP---H--
+
+---D9wKUdmP---Z--
+
+---WmvhX81h---A--
+[07/Jun/2026:21:24:39 +0000] 17808674797.236979 172.20.0.1 44336 10.244.0.16 80
+---WmvhX81h---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---WmvhX81h---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---WmvhX81h---H--
+
+---WmvhX81h---Z--
+
+---8seQ4J8J---A--
+[07/Jun/2026:21:24:39 +0000] 178086747976.094596 172.20.0.1 44348 10.244.0.16 80
+---8seQ4J8J---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---8seQ4J8J---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---8seQ4J8J---H--
+
+---8seQ4J8J---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:24:39 +0000] 178086747932.796975 172.20.0.1 44362 10.244.0.16 80
+---D9wKUdmP---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---D9wKUdmP---H--
+
+---D9wKUdmP---Z--
+
+---EBnvOgO2---A--
+[07/Jun/2026:21:24:39 +0000] 178086747969.469664 172.20.0.1 60734 10.244.0.16 80
+---EBnvOgO2---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---EBnvOgO2---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---EBnvOgO2---H--
+
+---EBnvOgO2---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:24:39 +0000] 178086747941.757294 172.20.0.1 60750 10.244.0.16 80
+---CJ31I2JE---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---CJ31I2JE---H--
+
+---CJ31I2JE---Z--
+
+---8seQ4J8J---A--
+[07/Jun/2026:21:24:39 +0000] 178086747991.818766 172.20.0.1 60766 10.244.0.16 80
+---8seQ4J8J---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---8seQ4J8J---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---8seQ4J8J---H--
+
+---8seQ4J8J---Z--
+
+---RoErTYdG---A--
+[07/Jun/2026:21:24:39 +0000] 178086747984.381443 172.20.0.1 60782 10.244.0.16 80
+---RoErTYdG---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---RoErTYdG---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---RoErTYdG---H--
+
+---RoErTYdG---Z--
+
+---WmvhX81h---A--
+[07/Jun/2026:21:24:39 +0000] 178086747962.794902 172.20.0.1 60788 10.244.0.16 80
+---WmvhX81h---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---WmvhX81h---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---WmvhX81h---H--
+
+---WmvhX81h---Z--
+
+---2ue1j3U1---A--
+[07/Jun/2026:21:24:39 +0000] 178086747924.734280 172.20.0.1 60802 10.244.0.16 80
+---2ue1j3U1---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---2ue1j3U1---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---2ue1j3U1---H--
+
+---2ue1j3U1---Z--
+
+---8seQ4J8J---A--
+[07/Jun/2026:21:24:39 +0000] 178086747956.448362 172.20.0.1 60818 10.244.0.16 80
+---8seQ4J8J---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---8seQ4J8J---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:24:39 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---8seQ4J8J---H--
+
+---8seQ4J8J---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:25:01 +0000] 178086750193.649552 172.20.0.1 51898 10.244.0.16 80
+---GGCGoDG6---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:25:01 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---GGCGoDG6---H--
+
+---GGCGoDG6---Z--
+
+---RoErTYdG---A--
+[07/Jun/2026:21:25:01 +0000] 178086750125.094603 172.20.0.1 51900 10.244.0.16 80
+---RoErTYdG---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---RoErTYdG---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:25:01 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---RoErTYdG---H--
+
+---RoErTYdG---Z--
+
+---2ue1j3U1---A--
+[07/Jun/2026:21:25:01 +0000] 178086750121.740608 172.20.0.1 51924 10.244.0.16 80
+---2ue1j3U1---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---2ue1j3U1---F--
+HTTP/1.1 429
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 162
+Date: Sun, 07 Jun 2026 21:25:01 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---2ue1j3U1---H--
+
+---2ue1j3U1---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:25:21 +0000] 178086752151.424593 172.20.0.1 39814 10.244.0.16 80
+---GGCGoDG6---B--
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/prometheus"] [unique_id "178086752151.424593"] [ref "o0,20o10,10v4,20"]
+
+---GGCGoDG6---Z--
+
+---WmvhX81h---A--
+[07/Jun/2026:21:25:21 +0000] 178086752171.954277 172.20.0.1 39820 10.244.0.16 80
+---WmvhX81h---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: sqlmap/1.7
+Accept: */*
+
+---WmvhX81h---F--
+HTTP/1.1 403
+
+---WmvhX81h---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `sqlmap/1.7' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: sqlmap/1.7"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086752171.954277"] [ref "o0,6v43,10"]
+
+---WmvhX81h---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:26:26 +0000] 178086758659.445238 172.20.0.1 57954 10.244.0.16 80
+---D9wKUdmP---B--
+GET /actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 403
+
+---D9wKUdmP---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/prometheus"] [unique_id "178086758659.445238"] [ref "o0,20o10,10v4,20"]
+
+---D9wKUdmP---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:26:26 +0000] 178086758639.908659 172.20.0.1 57958 10.244.0.16 80
+---CJ31I2JE---B--
+GET /actuator/info HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 403
+
+---CJ31I2JE---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/actuator/info' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/actuator/info"] [unique_id "178086758639.908659"] [ref "o0,14o10,4v4,14"]
+
+---CJ31I2JE---Z--
+
+---GGCGoDG6---A--
+[07/Jun/2026:21:26:26 +0000] 178086758657.869508 172.20.0.1 57974 10.244.0.16 80
+---GGCGoDG6---B--
+GET /proxy/catalog/../../actuator/prometheus HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---GGCGoDG6---F--
+HTTP/1.1 403
+
+---GGCGoDG6---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:^|/)actuator/(?!health(?:$|/|\?))(info|metrics|prometheus|env|beans|mappings|configprops|threaddump|heapdump|loggers|caches|sessions|httptrace|conditions|scheduledtasks|auditevents|gateway|refr (13 characters omitted)' against variable `REQUEST_URI' (Value: `/proxy/catalog/../../actuator/prometheus' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "29"] [id "99001"] [rev ""] [msg "WAF-TS-99001 Acceso bloqueado a endpoint sensible de Spring Actuator"] [data ""] [severity "2"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H4-actuator-exposed"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/proxy/catalog/../../actuator/prometheus"] [unique_id "178086758657.869508"] [ref "o20,20o30,10v4,40"]
+
+---GGCGoDG6---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:26:26 +0000] 178086758625.511117 172.20.0.1 57980 10.244.0.16 80
+---D9wKUdmP---B--
+GET /proxy/carts/actuator/health HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 403
+
+---D9wKUdmP---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)^/proxy/[^/]+/(?:actuator|debug|management|admin)\b' against variable `REQUEST_URI' (Value: `/proxy/carts/actuator/health' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "38"] [id "99003"] [rev ""] [msg "WAF-TS-99003 Acceso a ruta administrativa de backend via proxy bloqueado"] [data ""] [severity "3"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H1-backend-admin-via-proxy"] [tag "OWASP_CRS"] [tag "attack-disclosure"] [tag "CWE-200"] [hostname "localhost"] [uri "/proxy/carts/actuator/health"] [unique_id "178086758625.511117"] [ref "o0,21v4,28"]
+
+---D9wKUdmP---Z--
+
+---D9wKUdmP---A--
+[07/Jun/2026:21:26:27 +0000] 17808675871.605443 172.20.0.1 57988 10.244.0.16 80
+---D9wKUdmP---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.00 (Nikto/2.5.0)
+Accept: */*
+
+---D9wKUdmP---F--
+HTTP/1.1 403
+
+---D9wKUdmP---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `Mozilla/5.00 (Nikto/2.5.0)' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: Mozilla/5.00 (Nikto/2.5.0)"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "17808675871.605443"] [ref "o14,5v43,26"]
+
+---D9wKUdmP---Z--
+
+---CJ31I2JE---A--
+[07/Jun/2026:21:26:27 +0000] 178086758768.180734 172.20.0.1 57994 10.244.0.16 80
+---CJ31I2JE---B--
+GET / HTTP/1.1
+Host: localhost
+User-Agent: sqlmap/1.7.2
+Accept: */*
+
+---CJ31I2JE---F--
+HTTP/1.1 403
+
+---CJ31I2JE---H--
+ModSecurity: Access denied with code 403 (phase 1). Matched "Operator `Rx' with parameter `(?i)(?:nikto|sqlmap|nuclei|nessus|whatweb|wpscan|dirbuster|gobuster|wfuzz|masscan|zgrab|nmap)' against variable `REQUEST_HEADERS:User-Agent' (Value: `sqlmap/1.7.2' ) [file "/etc/nginx/modsecurity-custom/the-store.conf"] [line "41"] [id "99010"] [rev ""] [msg "WAF-TS-99010 User-Agent de scanner conocido bloqueado"] [data "UA: sqlmap/1.7.2"] [severity "4"] [ver ""] [maturity "0"] [accuracy "0"] [tag "the-store/H6-scanner-detected"] [tag "OWASP_CRS"] [tag "attack-reputation-scanner"] [tag "CWE-200"] [hostname "localhost"] [uri "/"] [unique_id "178086758768.180734"] [ref "o0,6v43,12"]
+
+---CJ31I2JE---Z--
+
+---WmvhX81h---A--
+[07/Jun/2026:21:26:27 +0000] 178086758730.069930 172.20.0.1 58000 10.244.0.16 80
+---WmvhX81h---B--
+POST /checkout HTTP/1.1
+Host: localhost
+User-Agent: curl/8.12.1
+Accept: */*
+Content-Length: 65
+Content-Type: application/x-www-form-urlencoded
+
+---WmvhX81h---C--
+firstName=%3Cscript%3Ealert%281%29%3C%2Fscript%3E&email=a%40b.com
+
+---WmvhX81h---F--
+HTTP/1.1 403
+Referrer-Policy: strict-origin-when-cross-origin
+X-Frame-Options: SAMEORIGIN
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Connection: keep-alive
+Content-Type: text/html
+Content-Length: 146
+Date: Sun, 07 Jun 2026 21:26:27 GMT
+Server: 
+Server: 
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+---WmvhX81h---H--
+ModSecurity: Warning. detected XSS using libinjection. [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "83"] [id "941100"] [rev ""] [msg "XSS Attack Detected via libinjection"] [data "Matched Data: XSS data found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086758730.069930"] [ref "v154,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)<script[^>]*>[\s\S]*?' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "110"] [id "941110"] [rev ""] [msg "XSS Filter - Category 1: Script Tag Vector"] [data "Matched Data: <script> found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086758730.069930"] [ref "o0,8v154,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)<[^0-9<>A-Z_a-z]*(?:[^\s\x0b\"'<>]*:)?[^0-9<>A-Z_a-z]*[^0-9A-Z_a-z]*?(?:s[^0-9A-Z_a-z]*?(?:c[^0-9A-Z_a-z]*?r[^0-9A-Z_a-z]*?i[^0-9A-Z_a-z]*?p[^0-9A-Z_a-z]*?t|t[^0-9A-Z_a-z]*?y[^0-9A-Z_a-z]*?l[^0-9A (4378 characters omitted)' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "205"] [id "941160"] [rev ""] [msg "NoScript XSS InjectionChecker: HTML Injection"] [data "Matched Data: <script found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "platform-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086758730.069930"] [ref "o0,7v154,25t:utf8toUnicode,t:urlDecodeUni,t:htmlEntityDecode,t:jsDecode,t:cssDecode,t:removeNulls"]
+ModSecurity: Warning. Matched "Operator `Rx' with parameter `(?i)\b(?:eval|set(?:timeout|interval)|new[\s\x0b]+Function|a(?:lert|tob)|btoa|(?:promp|impor)t|con(?:firm|sole\.(?:log|dir))|fetch)[\s\x0b]*[\(\{]' against variable `ARGS:firstName' (Value: `<script>alert(1)</script>' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-941-APPLICATION-ATTACK-XSS.conf"] [line "739"] [id "941390"] [rev ""] [msg "Javascript method detected"] [data "Matched Data: alert( found within ARGS:firstName: <script>alert(1)</script>"] [severity "2"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "application-multi"] [tag "language-multi"] [tag "attack-xss"] [tag "xss-perf-disable"] [tag "paranoia-level/1"] [tag "OWASP_CRS"] [tag "OWASP_CRS/ATTACK-XSS"] [tag "capec/1000/152/242"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086758730.069930"] [ref "o8,6v154,25t:htmlEntityDecode,t:jsDecode"]
+ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `20' ) [file "/etc/nginx/owasp-modsecurity-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 20)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/checkout"] [unique_id "178086758730.069930"] [ref ""]
+
+---WmvhX81h---Z--
+

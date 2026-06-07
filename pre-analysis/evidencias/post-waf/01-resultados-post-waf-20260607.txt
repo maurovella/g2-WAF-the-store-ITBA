@@ -1,0 +1,81 @@
+
+══════════════════════════════════════════════════════════════════════════════
+▶ Recon · headers de la home (post-WAF: deberían estar los 6 de seguridad)
+
+══════════════════════════════════════════════════════════════════════════════
+Response headers:
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H0 · La home sigue accesible (NO debería ser bloqueada por el WAF)
+
+══════════════════════════════════════════════════════════════════════════════
+  [[0;32mPASS[0m] GET /: HTTP 200 (tráfico legítimo OK)
+  [[0;32mPASS[0m] GET /actuator/health (whitelisted para K8s): HTTP 200 (tráfico legítimo OK)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H1 · Path traversal vía /proxy/* (regla custom 99002)
+
+══════════════════════════════════════════════════════════════════════════════
+  [[0;32mPASS[0m] H1.a · /proxy/catalog/../../debug/pprof/ (literal ..): HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H1.b · /proxy/carts/actuator/health (regla 99003): HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H1.c · path traversal URL-encoded: HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H1.d · /proxy/catalog/../../actuator/prometheus: HTTP 403 (WAF bloqueó como se esperaba)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H2 · Inyecciones (CRS 941xxx XSS / 942xxx SQLi)
+
+══════════════════════════════════════════════════════════════════════════════
+  [[0;32mPASS[0m] H2.a · XSS en firstName: HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H2.b · SQLi en firstName: HTTP 403 (WAF bloqueó como se esperaba)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H4 · Spring Actuator expuesto (regla custom 99001)
+
+══════════════════════════════════════════════════════════════════════════════
+  [[0;32mPASS[0m] H4.a · /actuator/info: HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H4.b · /actuator/health (whitelisted): HTTP 200 (tráfico legítimo OK)
+  [[0;32mPASS[0m] H4.c · /actuator/metrics: HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H4.d · /actuator/prometheus (Hallazgo estrella): HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H4.e · /actuator/env: HTTP 403 (WAF bloqueó como se esperaba)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H6 · Scanner detection (regla custom 99010)
+
+══════════════════════════════════════════════════════════════════════════════
+  [[0;32mPASS[0m] H6.a · User-Agent Nikto: HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H6.b · User-Agent sqlmap: HTTP 403 (WAF bloqueó como se esperaba)
+  [[0;32mPASS[0m] H6.c · User-Agent nuclei: HTTP 403 (WAF bloqueó como se esperaba)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H6 · Rate limit (nginx limit_req · 10 rps + burst·3)
+
+══════════════════════════════════════════════════════════════════════════════
+  Lanzando 100 requests CONCURRENTES a / (xargs -P 50)...
+  → 77/100 con 200 OK · 23/100 throttleados (429/503)
+  [[0;32mPASS[0m] Rate limit activo (23 requests bloqueados)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H6 · 6 headers de seguridad (más-set_headers vía annotation)
+
+══════════════════════════════════════════════════════════════════════════════
+  [[0;32mPASS[0m] Permissions-Policy presente
+  [[0;32mPASS[0m] CSP Report-Only presente
+  [[0;32mPASS[0m] HSTS presente
+  [[0;32mPASS[0m] X-Content-Type-Options presente
+  [[0;32mPASS[0m] X-Frame-Options presente
+  [[0;32mPASS[0m] Referrer-Policy presente
+  → 6/6 headers de seguridad presentes
+
+══════════════════════════════════════════════════════════════════════════════
+RESUMEN · TESTS POST-WAF
+  Pasaron:  23 / 23
+  Fallaron: 0 / 23
+
+══════════════════════════════════════════════════════════════════════════════
+  [[0;32mPASS[0m] Todos los tests post-WAF pasaron. El WAF cumple con la pre-entrega.

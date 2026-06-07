@@ -1,0 +1,137 @@
+
+══════════════════════════════════════════════════════════════════════════════
+▶ Recon · headers de la home
+
+══════════════════════════════════════════════════════════════════════════════
+HTTP/1.1 200 OK
+Date: Sun, 07 Jun 2026 21:00:17 GMT
+Content-Type: text/html
+Content-Length: 20557
+Connection: keep-alive
+Content-Language: en-US
+set-cookie: SESSIONID=926325d4-0611-44fb-846a-f2c2222018fd
+
+
+══════════════════════════════════════════════════════════════════════════════
+▶ Recon · ¿hay cabecera Server / X-Powered-By exponiendo stack?
+
+══════════════════════════════════════════════════════════════════════════════
+  (sin headers de seguridad)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H1.a · Path traversal contra debug/pprof del catalog (Go)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;31mERR[0m] HTTP 404 (otro estado)
+  body bytes: 126
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H1.b · Acceder a Spring Actuator del backend carts (NO debería ser alcanzable)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;31mERR[0m] HTTP 404 (otro estado)
+  body: {"timestamp":"2026-06-07T21:00:17.771+00:00","status":404,"error":"Not Found","path":"/carts/actuator/health"}
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H1.c · Path traversal con doble URL-encoding
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;31mERR[0m] HTTP 400 (otro estado)
+  body: <!doctype html><html lang="en"><head><title>HTTP Status 400 – Bad Request</title><style type="text/css">body {font-family:Tahoma,Arial,sans-serif;} h1, h2, h3, b {color:white;background-color:#525D7
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H2.a · XSS en firstName (Spring debería aceptar el form)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;31mERR[0m] HTTP 500 (otro estado)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H2.b · SQL injection en firstName
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;31mERR[0m] HTTP 500 (otro estado)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H2.c · CRLF injection en email (debe rebotar por @Email; el WAF lo cazaría primero)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H3 · Prompt injection al endpoint de chat (probablemente 404 si chat está disabled)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;31mERR[0m] HTTP 404 (otro estado)
+  body: {"timestamp":"2026-06-07T21:00:18.960+00:00","path":"/chat/submit","status":404,"error":"Not Found","requestId":"502de39b-13"}
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H4.a · /actuator/info (versión, build, git)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+  body: {}
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H4.b · /actuator/health (estado de los downstreams)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+  body: {"status":"UP","groups":["liveness","readiness"]}
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H4.c · /actuator/metrics (lista de métricas)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+  body: {"names":["application.ready.time","application.started.time","disk.free","disk.total","executor.active","executor.completed","executor.pool.core","executor.pool.max","executor.pool.size","executor.qu
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H4.d · /actuator/prometheus (serie completa)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+  bytes: 18990 (¡cuánta info se filtra!)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H4.e · /actuator/env (NO debería estar incluido pero probamos)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;31mERR[0m] HTTP 404 (otro estado)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H5 · Spoofing de IP de origen, scheme y host vía X-Forwarded-*
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+  (mirar logs de Spring: la app pensará que vino de 8.8.8.8 / https / evil-bank.com)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H6.a · User-Agent de Nikto (clásico scanner)
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H6.b · User-Agent de sqlmap
+
+══════════════════════════════════════════════════════════════════════════════
+[[0;32mPASS[0m] HTTP 200 (ataque NO bloqueado — vulnerable)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ H6.c · 50 requests rápidos (sin rate limit, todos deberían pasar)
+
+══════════════════════════════════════════════════════════════════════════════
+  códigos: 200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200  200 
+  → 50/50 con HTTP 200 (si hay 200=50, no hay rate limit)
+
+══════════════════════════════════════════════════════════════════════════════
+▶ Bonus · Headers de seguridad faltantes
+
+══════════════════════════════════════════════════════════════════════════════
+Headers presentes:
+  ❌ NO hay HSTS, X-Frame-Options, CSP, Referrer-Policy ni Permissions-Policy
+
+══════════════════════════════════════════════════════════════════════════════
+Tests completados. Revisar resultados-pre-waf.txt para el informe.
+
+══════════════════════════════════════════════════════════════════════════════

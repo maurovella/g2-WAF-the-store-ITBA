@@ -1,0 +1,6 @@
+# Maven/Gradle wrappers DEBEN tener line-endings LF: son scripts shell que
+# corren dentro de containers Linux durante el `docker build`. Con CRLF el
+# shebang `#!/bin/sh\r` falla con "required file not found" (exit 127).
+mvnw            text eol=lf
+gradlew         text eol=lf
+*.sh            text eol=lf

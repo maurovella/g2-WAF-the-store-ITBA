@@ -1,0 +1,122 @@
+# =============================================================================
+# Ingress de The Store con todas las anotaciones de WAF aplicadas
+# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# =============================================================================
+#
+# Este manifest REEMPLAZA el Ingress original (`dist/kubernetes.yaml`) que
+# solo tenía `kubernetes.io/ingress.class: nginx`.
+#
+# Cambios respecto al Ingress base:
+#
+#   1. Rate limiting por IP (Hallazgo H4 / pre-entrega item 4)
+#   2. Seis headers de seguridad HTTP (Hallazgo H6 / pre-entrega item 5)
+#         - HSTS, X-Frame-Options, X-Content-Type-Options
+#         - Content-Security-Policy en modo Report-Only (CSP permisiva)
+#         - Referrer-Policy, Permissions-Policy
+#   3. Per-Ingress ModSecurity snippet adicional
+#         - Endurece la detección sobre payloads que llegan al `ui`
+#         - Las reglas globales viven en el ConfigMap del controller
+#   4. Limita el tamaño del body (defensa básica vs DoS por payload grande)
+#
+# El controller debe estar configurado con `allow-snippet-annotations: "true"`
+# (lo hace `01-controller-configmap.yaml`).
+# =============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ui
+  namespace: the-store
+  labels:
+    app.kubernetes.io/name: ui
+    app.kubernetes.io/instance: ui
+    app.kubernetes.io/component: service
+    waf.the-store/managed-by: "tpe-grupo2"
+  annotations:
+    # -------------------------------------------------------------------------
+    # Clase de Ingress
+    # -------------------------------------------------------------------------
+    kubernetes.io/ingress.class: nginx
+
+    # -------------------------------------------------------------------------
+    # Rate limiting por IP (item 4 de la pre-entrega)
+    # -------------------------------------------------------------------------
+    # `limit-rps`         = requests por segundo permitidos por IP
+    # `limit-connections` = conexiones concurrentes por IP
+    # `limit-rpm`         = backstop adicional por minuto
+    #
+    # nginx implementa esto con `limit_req_zone` (leaky bucket) y
+    # `limit_conn_zone`. Cuando se excede devuelve 503 por default;
+    # forzamos 429 (Too Many Requests) que es el código semántico correcto.
+    # -------------------------------------------------------------------------
+    nginx.ingress.kubernetes.io/limit-rps: "10"
+    nginx.ingress.kubernetes.io/limit-connections: "20"
+    nginx.ingress.kubernetes.io/limit-rpm: "300"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+
+    # -------------------------------------------------------------------------
+    # Tamaño máximo de body (defensa anti-DoS)
+    # -------------------------------------------------------------------------
+    nginx.ingress.kubernetes.io/proxy-body-size: "1m"
+
+    # -------------------------------------------------------------------------
+    # Six security headers (item 5 de la pre-entrega)
+    # -------------------------------------------------------------------------
+    # `more_set_headers` viene de nginx-headers-more y reemplaza/añade
+    # headers en TODAS las respuestas (incluyendo 4xx/5xx, que `add_header`
+    # no toca por default).
+    #
+    # NOTA sobre CSP: la pre-entrega aclara que la Content-Security-Policy
+    # se entrega en modo Report-Only o permisiva, para no romper la UI.
+    # Acá usamos Report-Only con `default-src 'self'` y permitimos los
+    # recursos típicos que The Store usa (inline scripts/styles, fonts,
+    # imágenes desde el mismo origen).
+    # -------------------------------------------------------------------------
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      # 1. HSTS · fuerza HTTPS si el cliente alguna vez entra por TLS
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains";
+
+      # 2. X-Frame-Options · evita clickjacking (no se puede iframe-ar el sitio)
+      more_set_headers "X-Frame-Options: SAMEORIGIN";
+
+      # 3. X-Content-Type-Options · evita MIME-sniffing
+      more_set_headers "X-Content-Type-Options: nosniff";
+
+      # 4. Content-Security-Policy · en modo Report-Only para no romper la UI
+      #    Permisiva: permite inline scripts/styles que usa el frontend Spring Boot.
+      more_set_headers "Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'";
+
+      # 5. Referrer-Policy · no leakear URLs internas como Referer hacia afuera
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+
+      # 6. Permissions-Policy · deshabilita APIs sensibles del navegador
+      more_set_headers "Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()";
+
+      # Bonus · no exponer el header Server con la versión exacta de nginx
+      more_clear_headers "Server";
+
+    # -------------------------------------------------------------------------
+    # ModSecurity snippet per-Ingress
+    # -------------------------------------------------------------------------
+    # Las reglas globales (99001-99020) viven en el ConfigMap del controller.
+    # Acá agregamos refuerzos específicos del Ingress de The Store.
+    # -------------------------------------------------------------------------
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      # Activar el motor en este Ingress (redundante pero explícito).
+      SecRuleEngine On
+
+      # Asegurar que el body se inspecciona (para detectar SQLi en checkout, etc.)
+      SecRequestBodyAccess On
+      SecRequestBodyLimit 1048576
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "localhost"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ui
+                port:
+                  number: 80

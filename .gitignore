@@ -1,3 +1,6 @@
+# Claude Code session / worktrees (no van al repo)
+.claude/
+
 .DS_Store
 *.tfvars
 .terraform

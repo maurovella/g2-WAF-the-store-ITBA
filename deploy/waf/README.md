@@ -1,0 +1,60 @@
+# `deploy/waf/` · WAF stack para The Store
+
+ModSecurity v3 + OWASP CRS + reglas custom, deployado sobre el `ingress-nginx` que `./local.sh` ya levanta.
+
+## Archivos
+
+| Archivo | Qué hace |
+|---|---|
+| `01-controller-configmap.yaml` | ConfigMap del `ingress-nginx-controller` con ModSec + CRS + reglas globales 99001-99020 |
+| `02-the-store-ingress.yaml` | Reemplaza el Ingress de The Store con anotaciones de rate limit, 6 security headers y ModSec per-Ingress |
+| `install.sh` | Instalador idempotente · aplica, reinicia el controller, smoke-test |
+| `uninstall.sh` | Vuelve al estado pre-WAF |
+| `rules/` | Reservado para reglas adicionales si surgen falsos positivos |
+
+## Cómo correrlo
+
+```bash
+# 1. Levantar el cluster (si no está)
+./local.sh create-cluster --skip-tests
+
+# 2. (Opcional) Baseline pre-WAF
+bash pre-analysis/tests/01-pre-waf-attacks.sh | tee pre-analysis/evidencias/resultados-pre-waf.txt
+
+# 3. Instalar el WAF
+bash deploy/waf/install.sh
+
+# 4. Tests post-WAF + captura de evidencia
+bash pre-analysis/tests/collect-evidence.sh
+
+# 5. (Opcional) Revertir
+bash deploy/waf/uninstall.sh
+```
+
+## Reglas custom · cheat-sheet
+
+| ID | Hallazgo cubierto | Qué bloquea |
+|---|---|---|
+| **99001** | H4 · Spring Actuator expuesto | `/actuator/{info,metrics,prometheus,env,beans,...}` · permite `/actuator/health` |
+| **99002** | H1 · Path traversal vía `/proxy/*` | `/proxy/*` que contiene `..`, `%2e%2e`, `%252e%252e` |
+| **99003** | H1 · refuerzo SSRF | `/proxy/<svc>/(actuator|debug|admin|management)` |
+| **99010** | H6 · scanner detection | UAs `sqlmap`, `nikto`, `nuclei`, + extras |
+| **99020** | Whitelist quirúrgica | Desactiva CRS-920350 solo para `Host: localhost` |
+
+Las reglas 9xxxx son el rango reservado por OWASP CRS para reglas del usuario (no chocan con las del CRS oficial).
+
+## Cómo extraer el audit log para la demo
+
+```bash
+kubectl -n ingress-nginx exec deployment/ingress-nginx-controller -- \
+  tail -500 /tmp/modsec_audit.log
+```
+
+Cada entrada del audit log incluye:
+- Timestamp del request
+- Request original (método, URL, headers, body si aplica)
+- ID de la regla que disparó (`id "99001"` o CRS `id "942100"` etc.)
+- Acción tomada (`Access denied with code 403`)
+- Match data (qué exactamente disparó la regla)
+
+Esa info es lo que mostramos en el slide "antes/después" de la presentación oral.

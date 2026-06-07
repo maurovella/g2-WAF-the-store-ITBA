@@ -1,0 +1,104 @@
+# =============================================================================
+# ingress-nginx controller ConfigMap · ModSecurity v3 + OWASP CRS habilitados
+# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# =============================================================================
+#
+# Esta ConfigMap reemplaza la del namespace ingress-nginx (creada por el
+# manifest oficial de Kind) y activa ModSecurity v3 globalmente en el
+# controller, con el OWASP Core Rule Set (CRS) y nuestras reglas custom.
+#
+# La imagen oficial `registry.k8s.io/ingress-nginx/controller:v1.13.x` trae
+# `libmodsecurity` y el CRS pre-compilados en /etc/nginx/owasp-modsecurity-crs/.
+# Solo hay que activarlos vía flags del ConfigMap.
+#
+# Tras aplicar este manifest hay que reiniciar el controller para que tome
+# los cambios (lo hace `install.sh` automáticamente con `kubectl rollout`).
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    waf.the-store/managed-by: "tpe-grupo2"
+data:
+  # ---------------------------------------------------------------------------
+  # ModSecurity · activación global
+  # ---------------------------------------------------------------------------
+  enable-modsecurity: "true"
+  enable-owasp-modsecurity-crs: "true"
+
+  # ---------------------------------------------------------------------------
+  # Rate limiting: devolver 429 (Too Many Requests) en vez del 503 default.
+  # 429 es el código semánticamente correcto cuando se excede el límite por IP.
+  # ---------------------------------------------------------------------------
+  limit-req-status-code: "429"
+  limit-conn-status-code: "429"
+
+  # ---------------------------------------------------------------------------
+  # `allow-snippet-annotations: "true"` permite que los Ingress usen
+  # `nginx.ingress.kubernetes.io/configuration-snippet` y
+  # `nginx.ingress.kubernetes.io/modsecurity-snippet`. Por seguridad
+  # ingress-nginx >= 1.9 lo deshabilita por default. En un POC académico
+  # es aceptable; en producción se reemplazaría por reglas en este ConfigMap.
+  # ---------------------------------------------------------------------------
+  allow-snippet-annotations: "true"
+  annotations-risk-level: "Critical"
+
+  # ---------------------------------------------------------------------------
+  # Headers: no exponer la versión de nginx ni el server token.
+  # ---------------------------------------------------------------------------
+  server-tokens: "false"
+
+  # ---------------------------------------------------------------------------
+  # X-Forwarded-* spoofing (Hallazgo 03 de la auditoría pre-WAF):
+  # `use-forwarded-headers: false` hace que nginx ignore los XFF entrantes
+  # y use la IP real del cliente. En Kind el cliente es siempre 127.0.0.1
+  # pero conceptualmente cierra el vector.
+  # ---------------------------------------------------------------------------
+  use-forwarded-headers: "false"
+  compute-full-forwarded-for: "false"
+
+  # ---------------------------------------------------------------------------
+  # ModSecurity · configuración global del motor + nuestras reglas custom
+  # Se incluye ANTES de las reglas del CRS para que nuestras decisiones de
+  # bloqueo se apliquen primero (mejor performance, evita doble matching).
+  # ---------------------------------------------------------------------------
+  # IMPORTANTE sobre el formato de este snippet:
+  #   ingress-nginx envuelve el valor de `modsecurity-snippet` en una directiva
+  #   `modsecurity_rules '...'` (comillas SIMPLES). Por eso este snippet NO puede
+  #   contener comillas simples: cualquier `'` cierra el string y rompe el parseo
+  #   de nginx ("unexpected ..."). Las comillas DOBLES sí son válidas.
+  #
+  #   Las reglas custom (que necesitan msg:'...' con espacios) viven en un archivo
+  #   aparte montado como volumen y se cargan con `Include`. Ver:
+  #     - deploy/waf/rules/the-store.conf      (las reglas)
+  #     - deploy/waf/03-controller-deployment-patch.yaml  (el volume mount)
+  modsecurity-snippet: |
+    # === Motor ModSecurity ===
+    SecRuleEngine On
+    SecRequestBodyAccess On
+    SecRequestBodyLimit 13107200
+    SecRequestBodyNoFilesLimit 131072
+    SecResponseBodyAccess Off
+
+    # === Auditoria: log SOLO lo que disparo una regla ===
+    SecAuditEngine RelevantOnly
+    SecAuditLogParts ABCFHZ
+    SecAuditLogType Serial
+    # /tmp siempre es escribible en el container del controller; no hace falta
+    # montar volume extra. Para extraerlo en la demo: kubectl exec ... tail.
+    SecAuditLog /tmp/modsec_audit.log
+    SecAuditLogRelevantStatus "^(?:5|4(?!04))"
+
+    # === OWASP CRS: ya viene cargado por enable-owasp-modsecurity-crs ===
+    # Paranoia level 1 (default): suficiente para los casos de demo sin la
+    # masa de falsos positivos del PL 2+ sobre los endpoints legitimos de la app.
+
+    # === Reglas custom de The Store (99001-99020) ===
+    # Cargadas desde el volumen montado por 03-controller-deployment-patch.yaml.
+    # El archivo fuente es deploy/waf/rules/the-store.conf.
+    Include /etc/nginx/modsecurity-custom/the-store.conf

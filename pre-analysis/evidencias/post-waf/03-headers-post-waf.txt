@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+Date: Sun, 07 Jun 2026 21:25:43 GMT
+Content-Type: text/html
+Content-Length: 20557
+Connection: keep-alive
+Content-Language: en-US
+set-cookie: SESSIONID=d8d93352-48a6-4c00-8f9d-f71d163f506a
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Frame-Options: SAMEORIGIN
+X-Content-Type-Options: nosniff
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+
