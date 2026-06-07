@@ -1,6 +1,9 @@
 # Claude Code session / worktrees (no van al repo)
 .claude/
 
+# Artefactos temporales de demos (certs self-signed, etc.)
+.tls-demo-tmp/
+
 .DS_Store
 *.tfvars
 .terraform

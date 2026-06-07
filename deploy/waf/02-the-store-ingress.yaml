@@ -81,8 +81,13 @@ metadata:
       # 3. X-Content-Type-Options · evita MIME-sniffing
       more_set_headers "X-Content-Type-Options: nosniff";
 
-      # 4. Content-Security-Policy · en modo Report-Only para no romper la UI
-      #    Permisiva: permite inline scripts/styles que usa el frontend Spring Boot.
+      # 4. Content-Security-Policy · en modo Report-Only para no romper la UI.
+      #    Report-Only NO bloquea: solo reporta violaciones. Es observabilidad,
+      #    no enforcement. Decisión declarada en la pre-entrega (no romper la app).
+      #    El clickjacking lo frena X-Frame-Options (header 2), que sí aplica.
+      #    Para ENFORCEAR (bloquear de verdad) una vez validada la compatibilidad,
+      #    cambiar el nombre del header a "Content-Security-Policy" (sin -Report-Only):
+      #      more_set_headers "Content-Security-Policy: default-src 'self'; ...";
       more_set_headers "Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'";
 
       # 5. Referrer-Policy · no leakear URLs internas como Referer hacia afuera
@@ -97,13 +102,13 @@ metadata:
     # -------------------------------------------------------------------------
     # ModSecurity snippet per-Ingress
     # -------------------------------------------------------------------------
-    # Las reglas globales (99001-99020) viven en el ConfigMap del controller.
-    # Acá agregamos refuerzos específicos del Ingress de The Store.
+    # Las reglas globales (99001-99020) y el motor (SecRuleEngine) viven en el
+    # ConfigMap del controller. NO seteamos SecRuleEngine acá a propósito: si lo
+    # hiciéramos, este snippet per-location sobreescribiría el modo global y
+    # rompería el flujo DetectionOnly→On (que se controla globalmente).
+    # Acá sólo reforzamos la inspección de body para este Ingress.
     # -------------------------------------------------------------------------
     nginx.ingress.kubernetes.io/modsecurity-snippet: |
-      # Activar el motor en este Ingress (redundante pero explícito).
-      SecRuleEngine On
-
       # Asegurar que el body se inspecciona (para detectar SQLi en checkout, etc.)
       SecRequestBodyAccess On
       SecRequestBodyLimit 1048576
