@@ -56,6 +56,10 @@ create_cluster_and_deploy() {
 
     [ "$SKIP_TESTS" = true ] && print_warning "Tests skipped" || run_e2e_tests
     [ "$SKIP_STATUS" = true ] && print_warning "Status skipped" || show_status
+
+    # WAF se instala al final, DESPUÉS de los e2e tests: el rate limit del WAF
+    # (10 rps/IP) podría throttlear el tráfico legítimo de la suite e2e.
+    [ "$WITH_WAF" = true ] && install_waf
 }
 
 create_cluster() {
@@ -176,6 +180,20 @@ deploy_services() {
     print_success "All pods are ready and running"
 }
 
+install_waf() {
+    print_status "Installing WAF (ModSecurity v3 + OWASP CRS) on ingress-nginx..."
+    # Se delega en el instalador idempotente de deploy/waf. Le pasamos el
+    # namespace de la app por si se usó -n/--namespace (el default es the-store).
+    APP_NS="$NAMESPACE" bash "$DIR/deploy/waf/install.sh"
+    print_success "WAF installed"
+}
+
+uninstall_waf() {
+    print_status "Uninstalling WAF (restoring pre-WAF state)..."
+    APP_NS="$NAMESPACE" bash "$DIR/deploy/waf/uninstall.sh"
+    print_success "WAF uninstalled"
+}
+
 show_status() {
     print_status "Showing status for cluster '$CLUSTER_NAME'..."
     if kind get clusters | grep -q "^$CLUSTER_NAME$"; then
@@ -244,10 +262,13 @@ show_help() {
     echo "  reload-images   Build and load Docker images"
     echo "  e2e-test        Run end-to-end tests"
     echo "  load-test       Run load generator tests"
+    echo "  install-waf     Install the WAF (ModSecurity v3 + OWASP CRS) on the ingress"
+    echo "  uninstall-waf   Remove the WAF and restore the pre-WAF state"
     echo ""
     echo "OPTIONS:"
     echo "  -c, --cluster NAME   Cluster name (default: the-store)"
     echo "  -n, --namespace NAME Kubernetes namespace (default: the-store)"
+    echo "  --with-waf           Install the WAF after deploying (create-cluster/rebuild-cluster)"
     echo "  --skip-tests         Skip running e2e tests when creating/rebuilding cluster"
     echo "  --skip-status        Skip status display when creating/rebuilding cluster"
     echo "  -h, --help           Show this help"
@@ -325,6 +346,33 @@ cmd_load_generator() {
     run_load_generator
 }
 
+cmd_install_waf() {
+    check_prerequisites
+
+    if ! kind get clusters | grep -q "^$CLUSTER_NAME$"; then
+        print_error "Cluster '$CLUSTER_NAME' does not exist. Please create it first with 'create-cluster' command."
+        exit 1
+    fi
+
+    if ! kubectl get namespace $NAMESPACE &> /dev/null; then
+        print_error "Namespace '$NAMESPACE' does not exist. Please deploy services first with 'create-cluster' command."
+        exit 1
+    fi
+
+    install_waf
+}
+
+cmd_uninstall_waf() {
+    check_prerequisites
+
+    if ! kind get clusters | grep -q "^$CLUSTER_NAME$"; then
+        print_error "Cluster '$CLUSTER_NAME' does not exist. Please create it first with 'create-cluster' command."
+        exit 1
+    fi
+
+    uninstall_waf
+}
+
 run_load_generator() {
     print_status "Running load generator..."
     bash "$DIR/src/load-generator/scripts/run-docker.sh" -n host -t 'http://localhost' -d 600
@@ -338,12 +386,14 @@ main() {
     NAMESPACE="the-store"
     SKIP_TESTS=false
     SKIP_STATUS=false
+    WITH_WAF=false
 
     while [[ $# -gt 0 ]]; do
         case $1 in
-            help|create-cluster|delete-cluster|rebuild-cluster|status|reload-images|e2e-test|load-test) COMMAND="$1"; shift ;;
+            help|create-cluster|delete-cluster|rebuild-cluster|status|reload-images|e2e-test|load-test|install-waf|uninstall-waf) COMMAND="$1"; shift ;;
             -c|--cluster) CLUSTER_NAME="$2"; shift 2 ;;
             -n|--namespace) NAMESPACE="$2"; shift 2 ;;
+            --with-waf) WITH_WAF=true; shift ;;
             --skip-tests) SKIP_TESTS=true; shift ;;
             --skip-status) SKIP_STATUS=true; shift ;;
             -h|--help) show_help; exit 0 ;;
@@ -359,6 +409,8 @@ main() {
         reload-images) cmd_reload_images;;
         e2e-test) cmd_e2e_tests;;
         load-test) cmd_load_generator;;
+        install-waf) cmd_install_waf;;
+        uninstall-waf) cmd_uninstall_waf;;
         help) show_help; exit 0;;
         *) print_error "Unknown command: $COMMAND"; show_help; exit 1;;
     esac

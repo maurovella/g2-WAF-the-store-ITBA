@@ -15,21 +15,30 @@ ModSecurity v3 + OWASP CRS + reglas custom, deployado sobre el `ingress-nginx` q
 ## Cómo correrlo
 
 ```bash
+# Opción A · todo de una: levantar el cluster con el WAF ya instalado
+./local.sh create-cluster --with-waf
+
+# Opción B · paso a paso
 # 1. Levantar el cluster (si no está)
 ./local.sh create-cluster --skip-tests
 
 # 2. (Opcional) Baseline pre-WAF
 bash pre-analysis/tests/01-pre-waf-attacks.sh | tee pre-analysis/evidencias/resultados-pre-waf.txt
 
-# 3. Instalar el WAF
-bash deploy/waf/install.sh
+# 3. Instalar el WAF (vía local.sh, o directo con bash deploy/waf/install.sh)
+./local.sh install-waf
 
 # 4. Tests post-WAF + captura de evidencia
 bash pre-analysis/tests/collect-evidence.sh
 
 # 5. (Opcional) Revertir
-bash deploy/waf/uninstall.sh
+./local.sh uninstall-waf
 ```
+
+> `./local.sh install-waf` y `uninstall-waf` son wrappers del controlador raíz
+> sobre `deploy/waf/install.sh` / `uninstall.sh`; verifican que el cluster y el
+> namespace existan antes de tocar nada. Seguís pudiendo invocar los scripts
+> directamente si preferís.
 
 ## Reglas custom · cheat-sheet
 
