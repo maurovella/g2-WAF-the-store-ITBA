@@ -75,6 +75,7 @@ El tráfico legítimo sigue funcionando: `http://localhost/` → `200` y `/actua
 ### Material complementario
 
 - [deploy/waf/HOWTO.md](deploy/waf/HOWTO.md) — detalle del WAF: reglas custom, anatomía del audit log, demos guionadas.
+- [docs/faq-defensa-tpe-waf.md](docs/faq-defensa-tpe-waf.md) — preguntas esperables de la cátedra con respuestas cortas (preparación de la exposición oral).
 - [deploy/waf/demos/](deploy/waf/demos/) — 4 scripts para correr en vivo (rate limit, DetectionOnly vs On, norte-sur vs este-oeste, TLS/HSTS).
 - [pre-analysis/pre-entrega/](pre-analysis/pre-entrega/) — documento final de pre-entrega y evidencias.
 
