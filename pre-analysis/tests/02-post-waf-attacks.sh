@@ -172,17 +172,20 @@ fi
 # -----------------------------------------------------------------------------
 header "H6 · 6 headers de seguridad (más-set_headers vía annotation)"
 headers=$(curl -sS -D - -o /dev/null --max-time 5 "$HOST/")
-declare -A expected_headers=(
-    ["strict-transport-security"]="HSTS"
-    ["x-frame-options"]="X-Frame-Options"
-    ["x-content-type-options"]="X-Content-Type-Options"
-    ["content-security-policy-report-only"]="CSP Report-Only"
-    ["referrer-policy"]="Referrer-Policy"
-    ["permissions-policy"]="Permissions-Policy"
-)
+# Lista plana "header:nombre-legible" (sin arrays asociativos: el bash 3.2
+# default de macOS no soporta `declare -A` y rompería con `set -u`).
+expected_headers="
+strict-transport-security:HSTS
+x-frame-options:X-Frame-Options
+x-content-type-options:X-Content-Type-Options
+content-security-policy-report-only:CSP-Report-Only
+referrer-policy:Referrer-Policy
+permissions-policy:Permissions-Policy
+"
 present=0
-for key in "${!expected_headers[@]}"; do
-    name="${expected_headers[$key]}"
+for entry in $expected_headers; do
+    key="${entry%%:*}"
+    name="${entry#*:}"
     TESTS_TOTAL=$((TESTS_TOTAL + 1))
     if echo "$headers" | grep -qi "^$key:"; then
         echo -e "  [$PASS] $name presente"
