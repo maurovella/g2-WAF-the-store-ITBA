@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # Revert del WAF · vuelve al estado pre-WAF
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # Qué hace:

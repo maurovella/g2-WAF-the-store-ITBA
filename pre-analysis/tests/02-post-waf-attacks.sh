@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# Post-WAF security assessment · The Store (TPE WAF · ITBA · 1C 2026)
+# Post-WAF security assessment · The Store
 # =============================================================================
 # Espejo de `01-pre-waf-attacks.sh` con las assertions invertidas:
 #
@@ -98,7 +98,7 @@ code=$(curl -sS -o /dev/null -w "%{http_code}" "$HOST/proxy/catalog/../../actuat
 expect_blocked "H1.d · /proxy/catalog/../../actuator/prometheus" "$code"
 
 # H1.e/f · /proxy/* SIN cookie de sesión válida (reglas 99004/99005).
-# La pre-entrega comprometió denegar /proxy/* "que no traiga header de sesión
+# El diseño busca denegar /proxy/* "que no traiga header de sesión
 # válido". El front nunca llama /proxy/*, así que esto sólo corta el acceso
 # directo por curl/scanner.
 code=$(curl -sS -o /dev/null -w "%{http_code}" "$HOST/proxy/carts/test")
@@ -109,7 +109,7 @@ expect_blocked "H1.f · /proxy/carts/test con SESSIONID mal formada (regla 99004
 
 # H1.g · MISMO request CON una cookie SESSIONID con formato UUID válido debe
 # pasar (200): demuestra que no es un bloqueo ciego de /proxy/*, sino que
-# discrimina por sesión — como pidió la pre-entrega.
+# discrimina por sesión — según el diseño.
 code=$(curl -sS -o /dev/null -w "%{http_code}" -H 'Cookie: SESSIONID=8d085683-1d51-4459-a137-a746a17ce087' "$HOST/proxy/carts/test")
 expect_ok "H1.g · /proxy/carts/test con SESSIONID UUID válida (tráfico legítimo)" "$code"
 
@@ -229,7 +229,7 @@ echo "  Fallaron: $TESTS_FAILED / $TESTS_TOTAL"
 separator
 
 if [[ "$TESTS_FAILED" -eq 0 ]]; then
-    echo -e "  [$PASS] Todos los tests post-WAF pasaron. El WAF cumple con la pre-entrega."
+    echo -e "  [$PASS] Todos los tests post-WAF pasaron. El WAF cumple con los objetivos de diseño."
     exit 0
 else
     echo -e "  [$FAIL] $TESTS_FAILED tests fallaron. Revisar logs del controller:"

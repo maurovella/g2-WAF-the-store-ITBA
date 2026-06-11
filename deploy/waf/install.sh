@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # Instalador idempotente del WAF · ModSecurity v3 + OWASP CRS + reglas custom
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # Prerequisitos:
@@ -180,7 +180,7 @@ smoke_test() {
 # =============================================================================
 main() {
     echo "==============================================================="
-    echo " WAF Install · TPE Tema 9 · Grupo 2 · ITBA 1C 2026"
+    echo " WAF Install"
     echo "==============================================================="
 
     check_prerequisites

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Documento final · TPE Tema 9 · Protección de Servicios con WAF para The Store</title>
+<title>Protección de servicios con un WAF para The Store</title>
 <style>
 @page { size: A4; margin: 18mm 17mm 18mm 17mm; }
 * { box-sizing: border-box; }
@@ -66,15 +66,8 @@ hr { border: none; border-top: 1px solid #e7ebf1; margin: 14px 0; }
 </head>
 
 <body>
-<h1>Documento final · TPE Tema 9 · Protección de Servicios con WAF para The Store</h1>
-<p><strong>Tema 9 · Redes de Información · ITBA · 1C 2026</strong>
-<strong>Grupo 2</strong></p>
-<p><strong>Integrantes:</strong></p>
-<ul>
-<li>Mauro Vella</li>
-<li>Enrique Castillo - 68321</li>
-<li>Federico Inti Garcia Lauberer - 61374</li>
-</ul>
+<h1>Protección de servicios con un WAF para The Store</h1>
+<p><strong>Autores:</strong> Mauro Vella · Enrique Castillo · Federico Inti García Lauberer</p>
 <hr>
 <h1>Parte 1 · El problema: qué tenía The Store y por qué era grave</h1>
 <h2>1.1 Contexto</h2>
@@ -153,9 +146,9 @@ explotables sin autenticación</strong>, agrupados en <strong>6 clases de hallaz
 cualquier cliente anónimo. Es information disclosure de manual (CWE-200) y la
 base de reconocimiento para todo lo demás.</p>
 <hr>
-<h1>Parte 2 · Lo que propusimos en la pre-entrega</h1>
+<h1>Parte 2 · El enfoque propuesto</h1>
 <h2>2.1 La idea: un WAF en el punto de entrada</h2>
-<p>Propusimos desplegar <strong>ModSecurity v3</strong> (motor de inspección HTTP que registra o
+<p>El enfoque propuesto fue desplegar <strong>ModSecurity v3</strong> (motor de inspección HTTP que registra o
 bloquea requests según reglas) junto con el <strong>OWASP Core Rule Set (CRS)</strong>
 (~reglas mantenidas por OWASP que cubren los ataques web comunes) <strong>dentro del
 <code>ingress-nginx-controller</code> ya presente en el cluster</strong>.</p>
@@ -174,7 +167,7 @@ sobre tráfico legítimo antes de activar el bloqueo real.</li>
 requests maliciosas.</li>
 </ol>
 <h2>2.3 Alcance comprometido</h2>
-<p>Lo que la pre-entrega se comprometió a resolver:</p>
+<p>El alcance que el diseño se propuso cubrir:</p>
 <ul>
 <li><strong>Bloquear los endpoints de diagnóstico sensibles</strong>: <code>/actuator/info</code>,
 <code>/actuator/metrics</code>, <code>/actuator/prometheus</code> pasan de <code>200 OK</code> a <code>403 Forbidden</code>.</li>
@@ -547,13 +540,13 @@ assertions invertidas) verifica bloqueos <strong>y</strong> que la app legítima
 </tr>
 </tbody>
 </table>
-<h3>3.4.4 Trazabilidad: pre-entrega → implementación</h3>
-<p>Cada compromiso de la pre-entrega tiene su correlato en la implementación y un
+<h3>3.4.4 Trazabilidad: propuesta → implementación</h3>
+<p>Cada objetivo de la propuesta tiene su correlato en la implementación y un
 test que lo valida:</p>
 <table>
 <thead>
 <tr>
-<th>Comprometido en la pre-entrega</th>
+<th>Objetivo propuesto</th>
 <th>Implementado en</th>
 <th>Test que lo valida</th>
 </tr>
@@ -663,7 +656,7 @@ de cada uno, su output real (status + respuesta), y togglear el WAF para repetir
 la suite con el firewall levantado. Es la versión interactiva de los scripts
 <code>pre-analysis/tests/01-pre-waf-attacks.sh</code> y <code>02-post-waf-attacks.sh</code>. Ver
 <code>deploy/waf/demo-web/README.md</code> para levantarla.</p>
-<h2>3.7 Limitaciones honestas y trabajo futuro</h2>
+<h2>3.7 Limitaciones conocidas y trabajo futuro</h2>
 <ul>
 <li><strong>Un WAF no reemplaza código seguro.</strong> Es defensa en profundidad. Las
 vulnerabilidades de fondo (el <code>ProxyController</code> sin sanitizar, la validación
@@ -689,7 +682,7 @@ ModSec en Go, compatible con CRS), agregar NetworkPolicies para el este-oeste y
 enforcement real de la CSP.</p>
 <hr>
 <h1>Conclusión</h1>
-<p>El POC cumple el criterio de éxito de la pre-entrega: <strong>los vectores hoy
+<p>El proyecto cumple el criterio de éxito propuesto: <strong>los vectores hoy
 explotables en el punto de entrada HTTP quedaron detectados o bloqueados por el
 WAF, sin romper el acceso normal</strong> a la home, el catálogo, el carrito ni el
 checkout (<code>27/27</code> tests post-WAF en verde, <code>/</code> y <code>/actuator/health</code> siguen en

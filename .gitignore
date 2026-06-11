@@ -1,4 +1,4 @@
-# Claude Code session / worktrees (no van al repo)
+# Directorios de sesión / worktrees de herramientas locales (no van al repo)
 .claude/
 
 # Artefactos temporales de demos (certs self-signed, etc.)

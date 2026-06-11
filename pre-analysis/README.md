@@ -1,10 +1,6 @@
-# TPE · Protección de Servicios con WAF
-## Tema 9 · Redes de Información · ITBA · 1C 2026
+# Análisis de seguridad y diseño del WAF · The Store
 
-> Documento maestro del grupo. Consolida la exploración, la auditoría en vivo, el análisis de impacto y el diseño propuesto en una única referencia navegable. Los documentos originales quedan archivados en [`_archive/`](_archive/) por si se necesita trazabilidad.
->
-> **Deadline pre-entrega:** martes 21 de abril 2026 · **Demo final:** 9-18 de junio 2026
-> **Deliverable principal de hoy:** PDF de pre-entrega (≤ 4 páginas) basado en este documento.
+> Documento de análisis. Consolida la exploración, la auditoría en vivo, el análisis de impacto y el diseño propuesto en una única referencia navegable. Los documentos originales quedan archivados en [`_archive/`](_archive/).
 
 ---
 
@@ -20,28 +16,19 @@
 8. [Scope del POC y casos de uso](#8-scope-del-poc-y-casos-de-uso)
 9. [Alternativas consideradas](#9-alternativas-consideradas)
 10. [Plan de validación (testing local y antes/después)](#10-plan-de-validaci%C3%B3n-testing-local-y-antesdespu%C3%A9s)
-11. [Próximos pasos y cronograma](#11-pr%C3%B3ximos-pasos-y-cronograma)
-12. [Anexos](#12-anexos)
+11. [Anexos](#11-anexos)
 
 ---
 
 ## 1. Resumen ejecutivo
 
-**Objetivo.** Proteger la aplicación *The Store* (5 microservicios sobre Kubernetes) con un Web Application Firewall, cumpliendo las consignas del Tema 9 del TPE.
+**Objetivo.** Proteger la aplicación *The Store* (5 microservicios sobre Kubernetes) con un Web Application Firewall.
 
 **Solución elegida.** **ModSecurity v3 + OWASP Core Rule Set** desplegado como módulo del `ingress-nginx` controller del cluster. Una sola pieza, cero cambios en microservicios, cubre todos los puntos de entrada HTTP de la app.
 
 **Justificación cuantitativa.** Auditoría en vivo realizada el 16-abr-2026 contra el cluster local encontró **10 vectores explotables sin autenticación ni herramientas especiales**: SSRF vía `ProxyController`, path traversal que escapa al actuator del UI, IDOR en `/proxy/carts/{customerId}`, Spring Actuator expuesto con 25 KB de métricas por request, cero detección de scanners conocidos, cero rate limit, seis headers de seguridad ausentes. Detalle completo en §4 y §5.
 
 **Alcance del POC.** Siete casos de uso demostrables en vivo con el patrón antes/después, cubriendo las familias OWASP Top 10 A01, A03, A05, A07 y A10. Detalle en §8.
-
-**Entregables.**
-
-| Entregable | Formato | Vencimiento |
-|---|---|---|
-| Pre-entrega | PDF ≤ 4 páginas | **21-abr-2026** |
-| Código + how-to | Repo GitHub | 9-jun-2026 |
-| Presentación final | PPT + demo en vivo | 11/16/18-jun-2026 |
 
 ---
 
@@ -138,7 +125,7 @@ Aparecieron a principios de los 2000 como *virtual patches* — bloquear un SQLi
 | **Host-based / embedded** | **ModSecurity en Apache/Nginx**, Shadow Daemon | Bajo costo, granularidad, natural para K8s | Consume recursos del host |
 | Cloud-based / managed | Cloudflare, AWS WAF, Akamai Kona, Azure WAF | Sin infra, updates automáticos | Vendor lock-in, costo recurrente |
 
-Para este TP el modelo **host-based** es el natural: permite mostrar configuración real, cambiar reglas en vivo, leer logs propios, y todo corre en el mismo cluster.
+Para este proyecto el modelo **host-based** es el natural: permite mostrar configuración real, cambiar reglas en vivo, leer logs propios, y todo corre en el mismo cluster.
 
 ### 3.4 Lógicas de detección
 
@@ -170,7 +157,7 @@ ModSecurity es el motor; el **OWASP Core Rule Set (CRS)** es el conjunto de regl
 
 Conocer los IDs permite explicar en la demo *qué* regla disparó cada bloqueo.
 
-### 3.6 Limitaciones reales (honestidad para la defensa oral)
+### 3.6 Limitaciones reales
 
 - Los WAFs **no reemplazan código seguro** — son defense in depth.
 - Falsos positivos inevitables a PL altos, requieren tuning continuo.
@@ -548,10 +535,10 @@ Siete escenarios listos para mostrar en vivo con el patrón antes/después. Cada
 | Alternativa | Descartada porque… |
 |---|---|
 | **Shadow Daemon** | Requiere instrumentar PHP/Python/Perl. La UI es Java y los servicios son Go/Java/Node — el conector no aplica naturalmente. |
-| **OpenWAF** | Sin commits desde 2018, documentación parcialmente en chino, comunidad inexistente. Riesgo alto ante preguntas de la cátedra. |
+| **OpenWAF** | Sin commits desde 2018, documentación parcialmente en chino, comunidad inexistente. Riesgo alto de mantenimiento. |
 | **Coraza (OWASP)** | Sucesor moderno de ModSec, escrito en Go, compatible con CRS. Excelente técnicamente pero **no figura en el enunciado** → requiere aprobación previa. Se nombra como "evolución futura". |
-| **NAXSI** | WAF positivo (whitelist) para Nginx. Contraste teórico interesante pero curva de tuning empinada, no encaja en el deadline. |
-| **WAF cloud (Cloudflare / AWS WAF)** | Costo y/o cuenta del proveedor. El TP es local. |
+| **NAXSI** | WAF positivo (whitelist) para Nginx. Contraste teórico interesante pero curva de tuning empinada, no encaja en el alcance. |
+| **WAF cloud (Cloudflare / AWS WAF)** | Costo y/o cuenta del proveedor. El despliegue es local. |
 
 ---
 
@@ -561,9 +548,7 @@ Siete escenarios listos para mostrar en vivo con el patrón antes/después. Cada
 
 ### 10.1 Por qué el local alcanza
 
-El enunciado dice "Las presentaciones son **on-line y remota**" (pág. 4). La cátedra ve la demo por screen-share, **no se conecta ellos al cluster**. Nadie necesita acceso independiente. Lo que importa es que la demo corra sin fallos en la máquina del expositor.
-
-Además: **el WAF no se entera si el cliente es local o remoto**, solo inspecciona HTTP/S. Los payloads son idénticos. Para simular ataques desde distintas IPs se usa `X-Forwarded-For: 203.0.113.42` (rango TEST-NET-3) y distintas User-Agents.
+**El WAF no se entera si el cliente es local o remoto**, solo inspecciona HTTP/S. Los payloads son idénticos. Para simular ataques desde distintas IPs se usa `X-Forwarded-For: 203.0.113.42` (rango TEST-NET-3) y distintas User-Agents.
 
 ### 10.2 Estrategia de testing en 6 pasos
 
@@ -578,7 +563,7 @@ Además: **el WAF no se entera si el cliente es local o remoto**, solo inspeccio
 
 - **Cada uno de los 3 integrantes** levanta el cluster en su laptop con `./local.sh create-cluster --skip-tests` (< 3 min). Redundancia total, $0.
 - **Script de validación automatizado** (opcional, queda como evidencia en el repo): un workflow de GitHub Actions que levanta Kind, aplica el WAF, corre los 16 PoCs, exige 0/16 vulnerables.
-- **Cloudflare Tunnel** (opcional, solo si la cátedra pide probar desde sus máquinas): `cloudflared tunnel --url http://localhost` expone el cluster con URL HTTPS temporal durante los 30 min de la demo. Se cierra al terminar.
+- **Cloudflare Tunnel** (opcional): `cloudflared tunnel --url http://localhost` expone el cluster con URL HTTPS temporal durante los 30 min de la demo. Se cierra al terminar.
 
 ### 10.4 Entregables de validación
 
@@ -589,45 +574,14 @@ Además: **el WAF no se entera si el cliente es local o remoto**, solo inspeccio
 
 ---
 
-## 11. Próximos pasos y cronograma
-
-### 11.1 Hasta el 21/04 (pre-entrega)
-
-| # | Tarea | Responsable | Deadline |
-|---|---|---|---|
-| 1 | Validar scope con el profesor (preguntas en §12.C) | Uno del grupo | 17/04 |
-| 2 | Generar diagrama de arquitectura vectorial (PNG/SVG) | Infra | 18/04 |
-| 3 | Escribir PDF de 4 páginas basado en este README | Documentación | 19/04 |
-| 4 | Validar el PDF con los otros 2 integrantes | Todos | 20/04 |
-| 5 | Submitir en Campus ITBA | Cualquiera | **21/04 23:59** |
-
-### 11.2 Hasta el 9/06 (entrega final)
-
-- Desplegar ModSecurity + CRS en el cluster.
-- Escribir las reglas custom (anti-actuator, anti-proxy-traversal, anti-prompt-injection).
-- Tunear falsos positivos.
-- Grabar baseline post-WAF y generar diff.
-- Escribir `how-to` en repo GitHub.
-- Armar PPT final y ensayar la demo de 7 PoCs + logs de ModSec.
-
-### 11.3 Roles sugeridos (3 integrantes)
-
-| Rol | Responsabilidades |
-|---|---|
-| **Infra & K8s** | Manifests, ingress, ConfigMaps, redes CIDR, documentación de deploy |
-| **Reglas & Seguridad** | OWASP CRS config, reglas custom, tuning, validation diff |
-| **Documentación & Demo** | PDF, PPT, how-to, ensayo de demo, grabaciones screencast |
-
----
-
-## 12. Anexos
+## 11. Anexos
 
 ### Anexo A · Estructura del repo
 
 ```
 WAF-redes-ITBA/
 ├── README.md                          ← ESTE DOCUMENTO (master)
-├── Enunciado TPE.pdf                  ← consigna original
+├── Enunciado TPE.pdf                  ← enunciado del proyecto
 ├── the-store-main/                    ← código de la app (no modificar)
 ├── demo/
 │   ├── exploit-dashboard.html         ← dashboard interactivo, 18 exploits en botones
@@ -660,17 +614,8 @@ diff <(jq -c '.results[] | {id,status}' evidencias/pocs-data.json) \
      <(jq -c '.results[] | {id,status}' evidencias/pocs-data-post-waf.json)
 ```
 
-### Anexo C · Preguntas abiertas para el profesor
 
-1. **Scope del "WAF":** ¿ModSecurity v3 + CRS a nivel ingress-nginx cuenta como la implementación que pide el enunciado?
-2. **Page count:** ¿Las 4 páginas incluyen portada y diagrama o es contenido puro? ¿Hay template / font sugerido?
-3. **Modificaciones menores a la app:** activar el chat LLM con un mock de OpenAI para demo de prompt injection — ¿aceptable o cuenta como "modificar la app"?
-4. **Alcance del POC:** 3-4 categorías OWASP + reglas custom para contexto, ¿alcanza, o esperan cobertura completa?
-5. **Diagrama de arquitectura:** ¿CIDRs reales del Kind local o idealizados para producción?
-6. **Alternativas consideradas:** ¿profundidad técnica comparativa o solo nombre + 2-3 líneas de descarte?
-7. **Formato de la demo del 9/6:** live-hacking en pantalla compartida o estructurado paso a paso con capturas?
-
-### Anexo D · Fuentes consultadas
+### Anexo C · Fuentes consultadas
 
 - [Web Application Firewall Market — Fortune Business Insights](https://www.fortunebusinessinsights.com/web-application-firewall-market-108841)
 - [Web Application Firewall Market — IMARC Group](https://www.imarcgroup.com/web-application-firewall-market)
@@ -683,5 +628,3 @@ diff <(jq -c '.results[] | {id,status}' evidencias/pocs-data.json) \
 - Repo de la app: [`the-store-main/`](the-store-main/)
 
 ---
-
-*Última actualización: 16-abr-2026. Este documento reemplaza los MDs 01/02/03/04 que quedan en [`_archive/`](_archive/) para trazabilidad histórica.*

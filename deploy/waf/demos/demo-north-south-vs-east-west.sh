@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # DEMO · Cobertura del WAF: norte-sur (protegido) vs este-oeste (NO protegido)
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # QUÉ DEMUESTRA (concepto de redes clave para la oral)
@@ -14,7 +14,7 @@
 #     - Un atacante que YA comprometió un pod puede hablarle directo a los
 #       backends por su ClusterIP (red 10.96.0.0/12) sin pasar por el WAF.
 #
-#   Esto NO es un bug: es el alcance declarado en la pre-entrega ("no reemplaza
+#   Esto NO es un bug: es el alcance declarado del diseño ("no reemplaza
 #   autenticación entre microservicios"). El control complementario para
 #   este-oeste serían NetworkPolicies (capa 3/4) o un service mesh con mTLS.
 #
@@ -79,7 +79,7 @@ ok " CONCLUSIÓN"
 echo "   - Norte-sur (vía Ingress): WAF activo → 403. Perímetro protegido."
 echo "   - Este-oeste (pod→ClusterIP 10.96.0.0/12): el WAF NO intercepta."
 echo ""
-echo "   Es el alcance declarado en la pre-entrega: el WAF es un control"
+echo "   Es el alcance declarado del diseño: el WAF es un control"
 echo "   PERIMETRAL (capa 7, norte-sur). Proteger el tráfico este-oeste"
 echo "   requiere NetworkPolicies (capa 3/4) o un service mesh con mTLS,"
 echo "   que quedaron explícitamente fuera del alcance del POC."

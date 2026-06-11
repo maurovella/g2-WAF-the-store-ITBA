@@ -1,6 +1,6 @@
 # =============================================================================
 # Patch del Deployment ingress-nginx-controller · monta las reglas custom
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # Strategic-merge patch que agrega:

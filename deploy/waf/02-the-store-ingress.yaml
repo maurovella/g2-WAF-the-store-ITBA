@@ -1,6 +1,6 @@
 # =============================================================================
 # Ingress de The Store con todas las anotaciones de WAF aplicadas
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # Este manifest REEMPLAZA el Ingress original (`dist/kubernetes.yaml`) que
@@ -8,8 +8,8 @@
 #
 # Cambios respecto al Ingress base:
 #
-#   1. Rate limiting por IP (Hallazgo H4 / pre-entrega item 4)
-#   2. Seis headers de seguridad HTTP (Hallazgo H6 / pre-entrega item 5)
+#   1. Rate limiting por IP (Hallazgo H4)
+#   2. Seis headers de seguridad HTTP (Hallazgo H6)
 #         - HSTS, X-Frame-Options, X-Content-Type-Options
 #         - Content-Security-Policy en modo Report-Only (CSP permisiva)
 #         - Referrer-Policy, Permissions-Policy
@@ -38,7 +38,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
 
     # -------------------------------------------------------------------------
-    # Rate limiting por IP (item 4 de la pre-entrega)
+    # Rate limiting por IP
     # -------------------------------------------------------------------------
     # `limit-rps`         = requests por segundo permitidos por IP
     # `limit-connections` = conexiones concurrentes por IP
@@ -59,13 +59,13 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "1m"
 
     # -------------------------------------------------------------------------
-    # Six security headers (item 5 de la pre-entrega)
+    # Six security headers
     # -------------------------------------------------------------------------
     # `more_set_headers` viene de nginx-headers-more y reemplaza/añade
     # headers en TODAS las respuestas (incluyendo 4xx/5xx, que `add_header`
     # no toca por default).
     #
-    # NOTA sobre CSP: la pre-entrega aclara que la Content-Security-Policy
+    # NOTA sobre CSP: la Content-Security-Policy
     # se entrega en modo Report-Only o permisiva, para no romper la UI.
     # Acá usamos Report-Only con `default-src 'self'` y permitimos los
     # recursos típicos que The Store usa (inline scripts/styles, fonts,
@@ -83,7 +83,7 @@ metadata:
 
       # 4. Content-Security-Policy · en modo Report-Only para no romper la UI.
       #    Report-Only NO bloquea: solo reporta violaciones. Es observabilidad,
-      #    no enforcement. Decisión declarada en la pre-entrega (no romper la app).
+      #    no enforcement. Decisión de diseño (no romper la app).
       #    El clickjacking lo frena X-Frame-Options (header 2), que sí aplica.
       #    Para ENFORCEAR (bloquear de verdad) una vez validada la compatibilidad,
       #    cambiar el nombre del header a "Content-Security-Policy" (sin -Report-Only):

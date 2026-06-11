@@ -1,11 +1,9 @@
-# FAQ de defensa oral · TPE Tema 9 · WAF para The Store
+# Preguntas técnicas frecuentes · WAF para The Store
 
-**Grupo 2 · ITBA · Redes · 1C 2026**
-
-> Preguntas que la cátedra puede hacer durante la exposición, con respuestas
-> cortas listas para decir en voz alta. Cada respuesta remite a la sección del
-> [documento final](../pre-analysis/pre-entrega/documento-final-tpe-waf.md) o al
-> archivo donde está el detalle. Para repasar antes de la demo.
+> Preguntas habituales sobre el diseño y la operación del WAF, con respuestas
+> breves. Cada una remite a la sección del
+> [documento técnico](../pre-analysis/pre-entrega/documento-final-tpe-waf.md) o al
+> archivo donde está el detalle.
 
 ---
 
@@ -61,7 +59,7 @@ porque sobre un patrón específico de la app no hay ambigüedad.
 
 ---
 
-## Limitaciones (las van a preguntar seguro)
+## Limitaciones
 
 ### 6. ¿Qué pasa con el tráfico entre pods (este-oeste)?
 
@@ -79,13 +77,12 @@ Sí — un WAF de firmas es evadible y lo declaramos (§7). La regla `99002` det
 `..`, `%2e%2e` (encoded) y `%252e%252e` (doble encoded); un triple encode u
 ofuscaciones Unicode podrían escaparse de la regla custom, aunque el CRS tiene
 sus propias reglas de validación de encoding que suman score. La respuesta
-honesta: la defensa contra evasión es **capas** (CRS + custom + fix de código +
+en la práctica: la defensa contra evasión es **capas** (CRS + custom + fix de código +
 NetworkPolicies), no una regex perfecta.
 
 ### 8. La CSP está en Report-Only — ¿eso no es "no hacer nada"?
 
-Es **observabilidad antes que enforcement**, una decisión declarada ya en la
-pre-entrega: una CSP estricta rompía los estilos/scripts inline de la UI (§6.6).
+Es **observabilidad antes que enforcement**, una decisión de diseño: una CSP estricta rompía los estilos/scripts inline de la UI (§6.6).
 Report-Only reporta violaciones sin bloquear, lo que permite validar
 compatibilidad antes de enforcear. El riesgo principal que cubriría (clickjacking)
 queda cerrado por `X-Frame-Options: SAMEORIGIN`, que **sí** aplica. Pasar a
@@ -161,7 +158,7 @@ app corren **antes** de instalar el WAF en `create-cluster --with-waf`, a
 propósito, para que el rate limit no throttlee el tráfico legítimo de la suite
 (documento final §4.3).
 
-### 16. Si les falla algo en vivo, ¿qué miran?
+### 16. Si algo falla al ejecutar, ¿qué revisar?
 
 En orden: `kubectl -n ingress-nginx logs deployment/ingress-nginx-controller
 --tail=50` (¿cargó la config? ¿error de parseo?), el audit log

@@ -2,7 +2,7 @@
   "audit_metadata": {
     "timestamp": "2026-04-16T21:49:01Z",
     "target": "http://localhost",
-    "tool": "Claude Cowork live audit + JS fetch in DevTools",
+    "tool": "Manual live audit (browser DevTools + JS fetch)",
     "session": "TPE Protección de Servicios con WAF · ITBA · 1C 2026",
     "pre_waf_baseline": true,
     "total_pocs": 10,

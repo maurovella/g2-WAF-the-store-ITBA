@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # DEMO · Etapa DetectionOnly → On (el flujo de tuning prometido)
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # QUÉ DEMUESTRA
-#   El despliegue en dos etapas que prometimos en la pre-entrega:
+#   El despliegue en dos etapas del diseño:
 #     - DetectionOnly: el WAF NO bloquea, pero REGISTRA en el audit log qué
 #       habría bloqueado. Sirve para detectar falsos positivos sobre tráfico
 #       legítimo ANTES de activar el bloqueo real en producción.
@@ -65,7 +65,7 @@ trap restore_on EXIT
 pod() { kubectl get pod -n "$INGRESS_NS" -l app.kubernetes.io/component=controller -o jsonpath='{.items[0].metadata.name}'; }
 
 echo "==============================================================="
-echo " DEMO · DetectionOnly → On (flujo de tuning de la pre-entrega)"
+echo " DEMO · DetectionOnly → On (flujo de tuning)"
 echo "==============================================================="
 
 # ---- Etapa 1: DetectionOnly ----

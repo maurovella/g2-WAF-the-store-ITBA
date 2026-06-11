@@ -1,6 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# Pre-WAF security assessment — The Store (TPE WAF · ITBA · 1C 2026)
+# Pre-WAF security assessment — The Store
 # =============================================================================
 # Ejecuta los 7 PoCs documentados en el informe (§4) contra el cluster local.
 # Requisitos: cluster levantado con `./local.sh create-cluster` y respondiendo

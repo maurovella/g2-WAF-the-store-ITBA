@@ -1,5 +1,5 @@
 // =============================================================================
-// Servidor de la demo en vivo · TPE Tema 9 · WAF para The Store
+// Servidor de la demo en vivo · WAF para The Store
 // =============================================================================
 // Node nativo (http + child_process), SIN dependencias externas. Sirve la página
 // y ejecuta los curl reales contra el cluster (mismos comandos que la suite), así

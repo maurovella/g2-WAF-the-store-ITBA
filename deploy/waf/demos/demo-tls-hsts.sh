@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # DEMO · TLS en el Ingress → HSTS deja de ser decorativo
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # QUÉ DEMUESTRA (ataca la debilidad "HSTS sobre HTTP es inerte")
@@ -11,7 +11,7 @@
 #   certificado self-signed para localhost y mostramos que:
 #     1. https://localhost/ responde 200 y el header HSTS AHORA tiene sentido.
 #     2. http://localhost/ redirige a https (ssl-redirect del Ingress).
-#   Es la terminación TLS "en el Ingress" que menciona la pre-entrega.
+#   Es la terminación TLS "en el Ingress" del diseño.
 #
 # REQUISITOS: openssl, kubectl. El cluster Kind mapea el puerto 443 al host.
 #
@@ -60,7 +60,7 @@ b "→ Paso 1: generar certificado self-signed para CN=localhost..."
 # una ruta Windows (rompía el parseo del subject y no generaba el .crt).
 MSYS_NO_PATHCONV=1 openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
     -keyout "$CERTDIR/tls.key" -out "$CERTDIR/tls.crt" \
-    -subj "/CN=localhost/O=The Store TPE" \
+    -subj "/CN=localhost/O=The Store" \
     -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" >/dev/null 2>&1
 if [[ ! -s "$CERTDIR/tls.crt" ]]; then
     wn "! No se pudo generar el certificado (revisar openssl). Abortando."; exit 1

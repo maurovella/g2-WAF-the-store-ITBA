@@ -68,4 +68,4 @@ Cada entrada del audit log incluye:
 - Acción tomada (`Access denied with code 403`)
 - Match data (qué exactamente disparó la regla)
 
-Esa info es lo que mostramos en el slide "antes/después" de la presentación oral.
+Esa info es la base del contraste antes/después.

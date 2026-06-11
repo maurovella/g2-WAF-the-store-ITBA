@@ -2,7 +2,7 @@
   "audit_metadata": {
     "timestamp": "2026-04-16T21:47:03.541Z",
     "target": "http://localhost",
-    "tool": "Claude Cowork live audit",
+    "tool": "Manual live audit (browser DevTools)",
     "total_pocs": 16,
     "vulnerable_count": 13
   },

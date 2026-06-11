@@ -1,12 +1,6 @@
-# Documento final · TPE Tema 9 · Protección de Servicios con WAF para The Store
+# Protección de servicios con un WAF para The Store
 
-**Tema 9 · Redes de Información · ITBA · 1C 2026**
-**Grupo 2**
-
-**Integrantes:**
-- Mauro Vella
-- Enrique Castillo - 68321
-- Federico Inti Garcia Lauberer - 61374
+**Autores:** Mauro Vella · Enrique Castillo · Federico Inti García Lauberer
 
 ---
 
@@ -49,11 +43,11 @@ base de reconocimiento para todo lo demás.
 
 ---
 
-# Parte 2 · Lo que propusimos en la pre-entrega
+# Parte 2 · El enfoque propuesto
 
 ## 2.1 La idea: un WAF en el punto de entrada
 
-Propusimos desplegar **ModSecurity v3** (motor de inspección HTTP que registra o
+El enfoque propuesto fue desplegar **ModSecurity v3** (motor de inspección HTTP que registra o
 bloquea requests según reglas) junto con el **OWASP Core Rule Set (CRS)**
 (~reglas mantenidas por OWASP que cubren los ataques web comunes) **dentro del
 `ingress-nginx-controller` ya presente en el cluster**.
@@ -75,7 +69,7 @@ de negocio. Un solo lugar para auditar y ajustar.
 
 ## 2.3 Alcance comprometido
 
-Lo que la pre-entrega se comprometió a resolver:
+El alcance que el diseño se propuso cubrir:
 
 - **Bloquear los endpoints de diagnóstico sensibles**: `/actuator/info`,
   `/actuator/metrics`, `/actuator/prometheus` pasan de `200 OK` a `403 Forbidden`.
@@ -249,12 +243,12 @@ RESUMEN · TESTS POST-WAF
 | OWASP CRS | `942100/350` | SQL injection (libinjection) en checkout |
 | OWASP CRS | `949110` | Anomaly score excedido (suma de scores parciales) |
 
-### 3.4.4 Trazabilidad: pre-entrega → implementación
+### 3.4.4 Trazabilidad: propuesta → implementación
 
-Cada compromiso de la pre-entrega tiene su correlato en la implementación y un
+Cada objetivo de la propuesta tiene su correlato en la implementación y un
 test que lo valida:
 
-| Comprometido en la pre-entrega | Implementado en | Test que lo valida |
+| Objetivo propuesto | Implementado en | Test que lo valida |
 |---|---|---|
 | Bloquear `/actuator/{info,metrics,prometheus}` | regla 99001 | `02-post-waf-attacks.sh` H4.a/c/d + H4.a2 (índice) |
 | `/proxy/*` con `..` → bloqueado | regla 99002 | H1.a/c/d |
@@ -317,7 +311,7 @@ la suite con el firewall levantado. Es la versión interactiva de los scripts
 `pre-analysis/tests/01-pre-waf-attacks.sh` y `02-post-waf-attacks.sh`. Ver
 `deploy/waf/demo-web/README.md` para levantarla.
 
-## 3.7 Limitaciones honestas y trabajo futuro
+## 3.7 Limitaciones conocidas y trabajo futuro
 
 - **Un WAF no reemplaza código seguro.** Es defensa en profundidad. Las
   vulnerabilidades de fondo (el `ProxyController` sin sanitizar, la validación
@@ -346,7 +340,7 @@ enforcement real de la CSP.
 
 # Conclusión
 
-El POC cumple el criterio de éxito de la pre-entrega: **los vectores hoy
+El proyecto cumple el criterio de éxito propuesto: **los vectores hoy
 explotables en el punto de entrada HTTP quedaron detectados o bloqueados por el
 WAF, sin romper el acceso normal** a la home, el catálogo, el carrito ni el
 checkout (`27/27` tests post-WAF en verde, `/` y `/actuator/health` siguen en

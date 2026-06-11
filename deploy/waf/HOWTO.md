@@ -1,11 +1,11 @@
 # HOW-TO · Despliegue y verificación del WAF para The Store
 
-**TPE Tema 9 · Protección de Servicios con WAF · ITBA · Redes de Información · 1C 2026 · Grupo 2**
+**WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx**
 
 Este documento explica, paso a paso y **reproducible desde cero**, cómo levantar
 The Store sobre un cluster local de Kubernetes, instalar el WAF (ModSecurity v3 +
 OWASP CRS + reglas custom) sobre el `ingress-nginx`, y verificar los cinco casos
-comprometidos en la pre-entrega comparando el comportamiento **antes y después**
+cubiertos por el WAF comparando el comportamiento **antes y después**
 del WAF. Pensado para que alguien que clona el repo por primera vez pueda
 reproducir toda la demo sin contexto previo.
 
@@ -297,11 +297,11 @@ capa 7.
 
 > Hay una copia versionada del audit log de una corrida real en
 > [`pre-analysis/evidencias/post-waf/02-modsec_audit.log.txt`](../../pre-analysis/evidencias/post-waf/02-modsec_audit.log.txt),
-> útil para la presentación si no querés depender de un ataque en vivo.
+> útil si no querés depender de un ataque en vivo.
 
 ---
 
-## 8. Demos guionadas (opcional, para la exposición)
+## 8. Demos guionadas (opcional)
 
 En `deploy/waf/demos/` hay 4 scripts listos para correr en vivo:
 

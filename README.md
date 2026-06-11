@@ -11,31 +11,30 @@ Our platform provides a complete shopping experience with:
 
 ---
 
-## 🛡️ TPE · Protección de Servicios con WAF (ITBA · Redes · 1C 2026 · Grupo 2)
+## 🛡️ Protección de servicios con un WAF (ModSecurity v3 + OWASP CRS)
 
 Este repositorio extiende **The Store** con un **WAF (ModSecurity v3 + OWASP CRS +
-reglas custom)** sobre `ingress-nginx`, como Trabajo Práctico Especial del Tema 9.
+reglas custom)** sobre `ingress-nginx`. Toda la política vive en configuración del
+Ingress; el código de los microservicios no se toca.
 
-**Integrantes:** Mauro Vella · Enrique Castillo (68321) · Federico Inti García Lauberer (61374)
-· **Rama:** `feat/waf-modsecurity`
+**Autores:** Mauro Vella · Enrique Castillo · Federico Inti García Lauberer
 
-### 🔗 Accesos rápidos (para la corrección)
+### 🔗 Accesos rápidos
 
 | Recurso | Dónde |
 |---|---|
-| **Repositorio (público)** | https://github.com/maurovella/g2-WAF-the-store-ITBA |
-| **Rama del TPE** | `feat/waf-modsecurity` (ya integrada en `main`) |
-| **App desplegada (local)** | http://localhost/ — la tienda · http://localhost/actuator/health → `200` |
-| **Documento final** | [pre-analysis/pre-entrega/documento-final-tpe-waf.pdf](pre-analysis/pre-entrega/documento-final-tpe-waf.pdf) (`.md` y `.html` al lado) |
-| **Presentación** | [docs/presentacion-tpe-waf.pptx](docs/presentacion-tpe-waf.pptx) |
-| **How-to detallado del WAF** | [deploy/waf/HOWTO.md](deploy/waf/HOWTO.md) |
+| **Repositorio** | https://github.com/maurovella/g2-WAF-the-store-ITBA |
+| **Rama** | `feat/waf-modsecurity` (integrada en `main`) |
+| **App (local)** | http://localhost/ · `/actuator/health` → `200` |
+| **Documento técnico** | [pre-analysis/pre-entrega/documento-final-tpe-waf.pdf](pre-analysis/pre-entrega/documento-final-tpe-waf.pdf) (`.md` y `.html` al lado) |
+| **How-to del WAF** | [deploy/waf/HOWTO.md](deploy/waf/HOWTO.md) |
 | **Demo web en vivo** | [deploy/waf/demo-web/](deploy/waf/demo-web/) — `node server.js` → http://localhost:7099 |
-| **FAQ de defensa oral** | [docs/faq-defensa-tpe-waf.md](docs/faq-defensa-tpe-waf.md) |
-| **Reglas custom del WAF** | [deploy/waf/rules/the-store.conf](deploy/waf/rules/the-store.conf) (99001-99020) |
-| **Suite de ataques** | [pre-analysis/tests/](pre-analysis/tests/) — `01` pre-WAF (baseline) · `02` post-WAF (gate, 27/27) |
-| **Evidencia capturada** | [pre-analysis/evidencias/post-waf/](pre-analysis/evidencias/post-waf/) (incluye audit log de ModSecurity) |
+| **Reglas custom** | [deploy/waf/rules/the-store.conf](deploy/waf/rules/the-store.conf) (99001-99020) |
+| **Suite de ataques** | [pre-analysis/tests/](pre-analysis/tests/) — `01` pre-WAF · `02` post-WAF (27/27) |
+| **Evidencia** | [pre-analysis/evidencias/post-waf/](pre-analysis/evidencias/post-waf/) (audit log de ModSecurity) |
 
-> **Cómo correr la corrección en ~10 min:** seguir [Replicación paso a paso](#replicación-paso-a-paso). Todo el WAF es declarativo, idempotente y reversible (`install-waf` / `uninstall-waf`), sin tocar el código de los microservicios.
+El WAF es declarativo, idempotente y reversible (`install-waf` / `uninstall-waf`).
+Despliegue en ~10 min siguiendo [Replicación paso a paso](#replicación-paso-a-paso).
 
 **Prerequisitos:** Docker (Engine corriendo), Kind (≥0.20), kubectl (≥1.28), `curl` y `bash`.
 Docker con ~4 GB RAM / 2 CPUs para el nodo de Kind. Probado en macOS (bash 3.2) y Linux.
@@ -61,7 +60,7 @@ bash pre-analysis/tests/02-post-waf-attacks.sh
 ./local.sh delete-cluster     # borrar el cluster completo
 ```
 
-Verificación de los 7 casos comprometidos (antes → después del WAF):
+Verificación de los 7 casos cubiertos (antes → después del WAF):
 
 | # | Caso | Pre-WAF | Post-WAF | Qué lo bloquea |
 |---|------|---------|----------|----------------|
@@ -91,14 +90,6 @@ El tráfico legítimo sigue funcionando: `http://localhost/` → `200` y `/actua
 | La home da `503` recién desplegada o tras instalar el WAF | El ingress aún no registró el endpoint / controller recargando. | Esperar ~10-30s y reintentar el `curl`. |
 | El traversal da `404` en vez de `403`/`200` | `curl` normalizó el `../` del lado cliente. | Usar `curl --path-as-is`. |
 | El rate-limit no dispara `429` | Requests secuenciales quedan bajo 10 rps. | Mandarlas concurrentes: `seq 1 100 \| xargs -P 50 ...`. |
-
-### Material complementario
-
-- [deploy/waf/HOWTO.md](deploy/waf/HOWTO.md) — detalle del WAF: reglas custom, anatomía del audit log, demos guionadas.
-- [deploy/waf/demo-web/](deploy/waf/demo-web/) — **demo web en vivo**: página local para lanzar los ataques, ver el código y output, y togglear el WAF.
-- [docs/faq-defensa-tpe-waf.md](docs/faq-defensa-tpe-waf.md) — preguntas esperables de la cátedra con respuestas cortas (preparación de la exposición oral).
-- [deploy/waf/demos/](deploy/waf/demos/) — 4 scripts para correr en vivo (rate limit, DetectionOnly vs On, norte-sur vs este-oeste, TLS/HSTS).
-- [pre-analysis/pre-entrega/](pre-analysis/pre-entrega/) — documento final de pre-entrega y evidencias.
 
 ---
 

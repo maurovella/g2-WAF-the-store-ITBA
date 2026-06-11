@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # DEMO · Rate limit POR IP — aislamiento entre clientes
-# TPE Tema 9 · WAF para The Store · Grupo 2 · ITBA 1C 2026
+# WAF para The Store · ModSecurity v3 + OWASP CRS sobre ingress-nginx
 # =============================================================================
 #
 # QUÉ DEMUESTRA

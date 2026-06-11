@@ -1,5 +1,5 @@
 // =============================================================================
-// Manifiesto de ataques de la demo · TPE Tema 9 · WAF para The Store
+// Manifiesto de ataques de la demo · WAF para The Store
 // =============================================================================
 // Cada ataque es el MISMO que corre la suite (pre-analysis/tests/01 y 02), pero
 // descrito de forma estructurada para que el front lo muestre: qué hace, por qué
