@@ -19,8 +19,25 @@ reglas custom)** sobre `ingress-nginx`, como Trabajo Práctico Especial del Tema
 **Integrantes:** Mauro Vella · Enrique Castillo (68321) · Federico Inti García Lauberer (61374)
 · **Rama:** `feat/waf-modsecurity`
 
+### 🔗 Accesos rápidos (para la corrección)
+
+| Recurso | Dónde |
+|---|---|
+| **Repositorio (público)** | https://github.com/maurovella/g2-WAF-the-store-ITBA |
+| **Rama del TPE** | `feat/waf-modsecurity` (ya integrada en `main`) |
+| **App desplegada (local)** | http://localhost/ — la tienda · http://localhost/actuator/health → `200` |
+| **Documento final** | [pre-analysis/pre-entrega/documento-final-tpe-waf.pdf](pre-analysis/pre-entrega/documento-final-tpe-waf.pdf) (`.md` y `.html` al lado) |
+| **Presentación** | [docs/presentacion-tpe-waf.pptx](docs/presentacion-tpe-waf.pptx) |
+| **How-to detallado del WAF** | [deploy/waf/HOWTO.md](deploy/waf/HOWTO.md) |
+| **FAQ de defensa oral** | [docs/faq-defensa-tpe-waf.md](docs/faq-defensa-tpe-waf.md) |
+| **Reglas custom del WAF** | [deploy/waf/rules/the-store.conf](deploy/waf/rules/the-store.conf) (99001-99020) |
+| **Suite de ataques** | [pre-analysis/tests/](pre-analysis/tests/) — `01` pre-WAF (baseline) · `02` post-WAF (gate, 27/27) |
+| **Evidencia capturada** | [pre-analysis/evidencias/post-waf/](pre-analysis/evidencias/post-waf/) (incluye audit log de ModSecurity) |
+
+> **Cómo correr la corrección en ~10 min:** seguir [Replicación paso a paso](#replicación-paso-a-paso). Todo el WAF es declarativo, idempotente y reversible (`install-waf` / `uninstall-waf`), sin tocar el código de los microservicios.
+
 **Prerequisitos:** Docker (Engine corriendo), Kind (≥0.20), kubectl (≥1.28), `curl` y `bash`.
-Docker con ~4 GB RAM / 2 CPUs para el nodo de Kind.
+Docker con ~4 GB RAM / 2 CPUs para el nodo de Kind. Probado en macOS (bash 3.2) y Linux.
 
 ### Replicación paso a paso
 
@@ -43,15 +60,17 @@ bash pre-analysis/tests/02-post-waf-attacks.sh
 ./local.sh delete-cluster     # borrar el cluster completo
 ```
 
-Verificación de los 5 casos comprometidos (antes → después del WAF):
+Verificación de los 7 casos comprometidos (antes → después del WAF):
 
 | # | Caso | Pre-WAF | Post-WAF | Qué lo bloquea |
 |---|------|---------|----------|----------------|
 | 1 | `GET /actuator/prometheus` | `200` (fuga ~19 KB) | `403` | regla custom `99001` |
-| 2 | Traversal `/proxy/catalog/../../actuator/info` | `200` | `403` | regla custom `99002` |
-| 3 | `User-Agent: Nikto / sqlmap / nuclei` | `200` | `403` | regla custom `99010` |
-| 4 | Burst de 100 requests concurrentes a `/` | 100×`200` | ≈23×`429` | nginx `limit_req` (10 rps) |
-| 5 | Headers de seguridad en la home | 0/6 | 6/6 | annotation `more_set_headers` |
+| 2 | `GET /actuator` (índice HAL: lista todos los endpoints) | `200` | `403` | regla custom `99001` |
+| 3 | Traversal `/proxy/catalog/../../actuator/info` | `200` | `403` | regla custom `99002` |
+| 4 | `GET /proxy/carts/test` sin cookie de sesión | `200` (fuga datos) | `403` | reglas custom `99004`/`99005` |
+| 5 | `User-Agent: Nikto / sqlmap / nuclei` | `200` | `403` | regla custom `99010` |
+| 6 | Burst de 100 requests concurrentes a `/` | 100×`200` | ≈70×`429` | nginx `limit_req` (10 rps) |
+| 7 | Headers de seguridad en la home | 0/6 | 6/6 | annotation `more_set_headers` |
 
 El tráfico legítimo sigue funcionando: `http://localhost/` → `200` y `/actuator/health` → `200`
 (la regla 99001 lo excluye porque Kubernetes lo usa para los probes del pod del UI).
