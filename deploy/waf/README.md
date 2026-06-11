@@ -44,9 +44,11 @@ bash pre-analysis/tests/collect-evidence.sh
 
 | ID | Hallazgo cubierto | Qué bloquea |
 |---|---|---|
-| **99001** | H4 · Spring Actuator expuesto | `/actuator/{info,metrics,prometheus,env,beans,...}` · permite `/actuator/health` |
+| **99001** | H4 · Spring Actuator expuesto | `/actuator/{info,metrics,prometheus,env,beans,...}` y el índice `/actuator` · permite `/actuator/health` |
 | **99002** | H1 · Path traversal vía `/proxy/*` | `/proxy/*` que contiene `..`, `%2e%2e`, `%252e%252e` |
 | **99003** | H1 · refuerzo SSRF | `/proxy/<svc>/(actuator|debug|admin|management)` |
+| **99004** | H1 · `/proxy/*` sin sesión | `/proxy/*` con cookie `SESSIONID` sin formato UUID válido (chain) |
+| **99005** | H1 · `/proxy/*` sin sesión | `/proxy/*` sin ningún header `Cookie` (chain · acceso directo curl/scanner) |
 | **99010** | H6 · scanner detection | UAs `sqlmap`, `nikto`, `nuclei`, + extras |
 | **99020** | Whitelist quirúrgica | Desactiva CRS-920350 solo para `Host: localhost` |
 

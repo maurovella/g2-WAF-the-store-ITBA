@@ -235,8 +235,8 @@ Resultado esperado:
 
 ```text
 RESUMEN · TESTS POST-WAF
-  Pasaron:  23 / 23
-  Fallaron: 0 / 23
+  Pasaron:  27 / 27
+  Fallaron: 0 / 27
 ```
 
 ### Tabla resumen antes/después

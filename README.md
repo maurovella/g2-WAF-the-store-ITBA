@@ -35,7 +35,7 @@ bash pre-analysis/tests/01-pre-waf-attacks.sh | tee /tmp/baseline-pre-waf.txt
 # 3. Instalar el WAF (ModSecurity v3 + OWASP CRS + reglas custom 99001-99020)
 ./local.sh install-waf
 
-# 4. Ataques DESPUÉS del WAF: deben quedar BLOQUEADOS (esperado: 23/23)
+# 4. Ataques DESPUÉS del WAF: deben quedar BLOQUEADOS (esperado: 27/27)
 bash pre-analysis/tests/02-post-waf-attacks.sh
 
 # 5. Revertir / limpiar

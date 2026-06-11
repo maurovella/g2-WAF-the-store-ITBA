@@ -127,18 +127,31 @@ idempotente y reversible**.
 | `01-controller-configmap.yaml` | Reemplaza la ConfigMap del controller: activa ModSec + CRS, fuerza `429` en rate limit, `server-tokens: false`, `use-forwarded-headers: false` (cierra H5), motor `SecRuleEngine On`, audit log en `/tmp/modsec_audit.log` (`SecAuditLogParts ABCFHZ`) e `Include` de las reglas custom. |
 | `02-the-store-ingress.yaml` | Reemplaza el Ingress de `ui`: rate limit por IP (`limit-rps: 10`, `limit-connections: 20`, `limit-burst-multiplier: 3`), `proxy-body-size: 1m`, los 6 headers de seguridad vía `more_set_headers`, CSP Report-Only y refuerzo de inspección de body por-Ingress. |
 | `03-controller-deployment-patch.yaml` | Strategic-merge patch que monta la ConfigMap `modsec-custom-rules` como volumen read-only en `/etc/nginx/modsecurity-custom/`. |
-| `rules/the-store.conf` | Las 5 reglas custom (99001-99020). |
+| `rules/the-store.conf` | Las 7 reglas custom (99001-99020). |
 | `install.sh` / `uninstall.sh` | Instalador idempotente (con smoke-test) y revert al estado pre-WAF. |
 
 ### 4.2 Reglas custom (rango 99000-99999, reservado por CRS para el usuario)
 
 | ID | Hallazgo | Acción | Detalle |
 |---|---|---|---|
-| **99001** | H4 · Actuator | `deny 403` | Bloquea `/actuator/{info,metrics,prometheus,env,heapdump,…}` directo y vía proxy. **Excluye `health`** (lo usan los probes de K8s). |
+| **99001** | H4 · Actuator | `deny 403` | Bloquea `/actuator/{info,metrics,prometheus,env,heapdump,…}` directo y vía proxy, **más el índice `/actuator`** (que lista en HAL todos los endpoints disponibles). **Excluye `health`** (lo usan los probes de K8s). |
 | **99002** | H1 · traversal | `deny 403` | `/proxy/*` con `..`, `%2e%2e` o `%252e%252e` (doble URL-encode). |
 | **99003** | H1 · admin vía proxy | `deny 403` | `/proxy/<svc>/(actuator\|debug\|management\|admin)`. |
+| **99004** | H1 · proxy sin sesión | `deny 403` | `/proxy/*` con cookie `SESSIONID` presente pero sin formato UUID válido (chain). |
+| **99005** | H1 · proxy sin sesión | `deny 403` | `/proxy/*` sin ningún header `Cookie` (chain con `&...@eq 0`). Cubre el caso del acceso directo por curl/scanner, que 99004 no ve porque libmodsecurity v3 no itera sobre una colección ausente. |
 | **99010** | H6 · scanners | `deny 403` | User-Agents de `sqlmap`, `nikto`, `nuclei`, `nmap`, `wpscan`, … (refuerza CRS 913xxx). |
 | **99020** | tuning | `pass` | Whitelist quirúrgica: desactiva CRS `920350` (Host numérico) sólo para `Host: localhost/127.0.0.1`. |
+
+> **Reglas 99004/99005 · la segunda rama del cierre del proxy.** La pre-entrega
+> comprometió denegar `/proxy/*` que tuviera `..` **o** que "no trajera header de
+> sesión válido". La primera rama la cubre 99002; estas dos cierran la segunda.
+> La app emite una cookie `SESSIONID` (UUID) en la primera visita a `/`
+> (`SessionIDWebFilter`), y el front **nunca** invoca `/proxy/*` desde el
+> navegador — así que exigir la cookie no rompe ningún flujo legítimo, sólo corta
+> el acceso directo por curl/scanner. Limitación honesta: un atacante puede
+> fabricar una `SESSIONID` con formato UUID; la validación criptográfica de la
+> sesión es responsabilidad de la app, no del WAF. La regla eleva la barrera y
+> cubre el caso por defecto.
 
 Las inyecciones de H2 (XSS/SQLi) **no necesitaron regla custom**: las cubre el CRS
 base (familias `941xxx`, `942xxx`, scoring `949110`). Esto valida la decisión de
@@ -186,8 +199,8 @@ assertions invertidas) verifica bloqueos **y** que la app legítima siga viva:
 
 ```text
 RESUMEN · TESTS POST-WAF
-  Pasaron:  23 / 23
-  Fallaron: 0 / 23
+  Pasaron:  27 / 27
+  Fallaron: 0 / 27
 ```
 
 ### 5.3 Defensa en profundidad confirmada en el audit log
@@ -197,6 +210,7 @@ RESUMEN · TESTS POST-WAF
 | Custom | `99001` | `/actuator/{info,metrics,prometheus,env}` |
 | Custom | `99002` | traversal `..` / `%2e%2e` sobre `/proxy/*` |
 | Custom | `99003` | `/proxy/<svc>/actuator` (ruta admin vía proxy) |
+| Custom | `99004/99005` | `/proxy/*` sin cookie `SESSIONID` válida (acceso directo curl/scanner) |
 | Custom | `99010` | User-Agents de sqlmap / nikto / nuclei |
 | OWASP CRS | `941100/110/160/390` | XSS (libinjection + filtros) en checkout |
 | OWASP CRS | `942100/350` | SQL injection (libinjection) en checkout |
@@ -285,13 +299,13 @@ enforcement real de la CSP.
 El POC cumple el criterio de éxito de la pre-entrega: **los 10 vectores hoy
 explotables en el punto de entrada HTTP quedaron detectados o bloqueados por el
 WAF, sin romper el acceso normal** a la home, el catálogo, el carrito ni el
-checkout (`23/23` tests post-WAF en verde, `/` y `/actuator/health` siguen en
+checkout (`27/27` tests post-WAF en verde, `/` y `/actuator/health` siguen en
 `200`).
 
 La decisión arquitectural clave — **ModSecurity + CRS en el Ingress, con reglas
 custom sólo para la lógica propia de The Store** — se validó en la práctica: el
 CRS resolvió las inyecciones genéricas (XSS/SQLi) sin una sola línea custom,
-mientras que las 5 reglas propias cubrieron lo que el CRS no conoce (Actuator,
+mientras que las 7 reglas propias cubrieron lo que el CRS no conoce (Actuator,
 proxy traversal, scanners). Todo quedó **declarativo, idempotente y reversible**,
 integrado en `local.sh` y reproducible desde cero siguiendo el
 [HOWTO](../../deploy/waf/HOWTO.md).

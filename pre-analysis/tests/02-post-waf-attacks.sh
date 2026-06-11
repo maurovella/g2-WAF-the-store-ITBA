@@ -97,6 +97,22 @@ expect_blocked "H1.c · path traversal URL-encoded" "$code"
 code=$(curl -sS -o /dev/null -w "%{http_code}" "$HOST/proxy/catalog/../../actuator/prometheus")
 expect_blocked "H1.d · /proxy/catalog/../../actuator/prometheus" "$code"
 
+# H1.e/f · /proxy/* SIN cookie de sesión válida (reglas 99004/99005).
+# La pre-entrega comprometió denegar /proxy/* "que no traiga header de sesión
+# válido". El front nunca llama /proxy/*, así que esto sólo corta el acceso
+# directo por curl/scanner.
+code=$(curl -sS -o /dev/null -w "%{http_code}" "$HOST/proxy/carts/test")
+expect_blocked "H1.e · /proxy/carts/test SIN cookie de sesión (regla 99005)" "$code"
+
+code=$(curl -sS -o /dev/null -w "%{http_code}" -H 'Cookie: SESSIONID=invalida' "$HOST/proxy/carts/test")
+expect_blocked "H1.f · /proxy/carts/test con SESSIONID mal formada (regla 99004)" "$code"
+
+# H1.g · MISMO request CON una cookie SESSIONID con formato UUID válido debe
+# pasar (200): demuestra que no es un bloqueo ciego de /proxy/*, sino que
+# discrimina por sesión — como pidió la pre-entrega.
+code=$(curl -sS -o /dev/null -w "%{http_code}" -H 'Cookie: SESSIONID=8d085683-1d51-4459-a137-a746a17ce087' "$HOST/proxy/carts/test")
+expect_ok "H1.g · /proxy/carts/test con SESSIONID UUID válida (tráfico legítimo)" "$code"
+
 # -----------------------------------------------------------------------------
 # H2 · Inyecciones en checkout  (esperado: BLOQUEADO por CRS)
 # -----------------------------------------------------------------------------
@@ -121,6 +137,11 @@ expect_blocked "H2.b · SQLi en firstName" "$code"
 header "H4 · Spring Actuator expuesto (regla custom 99001)"
 code=$(curl -sS -o /dev/null -w "%{http_code}" "$HOST/actuator/info")
 expect_blocked "H4.a · /actuator/info" "$code"
+
+# H4.a2 · el ÍNDICE /actuator (sin sufijo) lista en HAL todos los endpoints
+# actuator → mapa de reconocimiento. La regla 99001 ampliada también lo cubre.
+code=$(curl -sS -o /dev/null -w "%{http_code}" "$HOST/actuator")
+expect_blocked "H4.a2 · /actuator (índice HAL)" "$code"
 
 # H4.b: /actuator/health SÍ debe responder 200 (lo necesita el liveness probe)
 code=$(curl -sS -o /dev/null -w "%{http_code}" "$HOST/actuator/health")
