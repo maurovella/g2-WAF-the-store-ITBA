@@ -64,35 +64,35 @@ blockquote p { margin: 2px 0; }
 hr { border: none; border-top: 1px solid #e7ebf1; margin: 14px 0; }
 </style>
 </head>
+
 <body>
-<div class="cover"><div class="title">Documento final · TPE Tema 9 · Protección de Servicios con WAF para The Store</div><div class="subtitle">Tema 9 · Redes de Información · ITBA · 1C 2026</div><div class="group">Grupo 2</div><div class="members-label">Integrantes</div><div class="member">Mauro Vella</div><div class="member">Enrique Castillo - 68321</div><div class="member">Federico Inti Garcia Lauberer - 61374</div></div>
-<blockquote>
-<p>Este documento es la <strong>entrega final</strong> del TPE y extiende la pre-entrega del
-21/04. Mantiene el contexto y el diseño propuestos originalmente, y agrega lo
-que la pre-entrega no podía tener todavía: la <strong>implementación realizada</strong>, los
-<strong>resultados reales</strong> medidos sobre el cluster, los <strong>problemas encontrados
-durante el tuning</strong> y la <strong>conclusión</strong> con limitaciones honestas.</p>
-</blockquote>
-<h2>1. Problemática y contexto</h2>
+<h1>Documento final · TPE Tema 9 · Protección de Servicios con WAF para The Store</h1>
+<p><strong>Tema 9 · Redes de Información · ITBA · 1C 2026</strong>
+<strong>Grupo 2</strong></p>
+<p><strong>Integrantes:</strong></p>
+<ul>
+<li>Mauro Vella</li>
+<li>Enrique Castillo - 68321</li>
+<li>Federico Inti Garcia Lauberer - 61374</li>
+</ul>
+<hr>
+<h1>Parte 1 · El problema: qué tenía The Store y por qué era grave</h1>
+<h2>1.1 Contexto</h2>
 <p>The Store es una aplicación de e-commerce construida con <strong>cinco microservicios</strong>
 (Java/Spring, Go/Gin, Node.js/NestJS) que se despliega sobre un cluster local de
 Kubernetes (Kind) de un único nodo. Toda la entrada externa pasa por un único
 punto: <code>ingress-nginx</code> escuchando en el puerto 80/443 del host. Los backends
 (<code>catalog</code>, <code>carts</code>, <code>orders</code>, <code>checkout</code>) son <code>ClusterIP</code> y no deberían ser
 accesibles desde afuera; sólo la <code>ui</code> está publicada.</p>
-<ul>
-<li>La auditoría pre-WAF contra <code>http://localhost</code> confirmó <strong>10 vectores
-  explotables</strong> sin autenticación, agrupados en <strong>6 clases de hallazgo</strong>. Los más
-  críticos: SSRF / path traversal vía <code>/proxy/**</code>, acceso a rutas administrativas
-  de backends vía el proxy, y exposición de Spring Actuator.</li>
-<li>No había <strong>rate limiting</strong>, <strong>scanner detection</strong> ni <strong>headers HTTP de
-  seguridad</strong>. Esto dejaba la puerta abierta a enumeración, scraping, abuso
-  automatizado, fuga de información operativa y reconocimiento.</li>
-<li>El problema es <strong>transversal a una arquitectura multi-lenguaje</strong>: corregir en
-  Java, Go y Node por separado requiere cambios distribuidos. Un WAF aplica una
-  <strong>política unificada en el punto de entrada</strong>, sin tocar el código de negocio.</li>
-</ul>
-<h3>1.1 Hallazgos de la auditoría (6 clases · 10 vectores confirmados)</h3>
+<p>El problema de fondo: <strong>la app no tenía ninguna defensa en la capa 7</strong>. No había
+inspección de requests, ni rate limiting, ni filtrado de patrones de ataque, ni
+headers de seguridad. Cualquiera con <code>curl</code> podía atacar la superficie HTTP sin
+fricción. Y como es una arquitectura <strong>multi-lenguaje</strong>, corregir cada agujero en
+Java, Go y Node por separado significa cambios distribuidos en tres stacks
+distintos — lento y propenso a inconsistencias.</p>
+<h2>1.2 Hallazgos de la auditoría y su gravedad</h2>
+<p>Auditamos la app pre-WAF contra <code>http://localhost</code> y confirmamos <strong>10 vectores
+explotables sin autenticación</strong>, agrupados en <strong>6 clases de hallazgo</strong>:</p>
 <table>
 <thead>
 <tr>
@@ -100,7 +100,7 @@ accesibles desde afuera; sólo la <code>ui</code> está publicada.</p>
 <th>Clase de hallazgo</th>
 <th>Severidad</th>
 <th>OWASP 2025</th>
-<th>Vectores (PoCs) confirmados</th>
+<th>Por qué es grave</th>
 </tr>
 </thead>
 <tbody>
@@ -109,71 +109,92 @@ accesibles desde afuera; sólo la <code>ui</code> está publicada.</p>
 <td>SSRF + path traversal vía <code>/proxy/**</code></td>
 <td>Crítica</td>
 <td>A03 / A10</td>
-<td><code>/proxy/carts/admin</code>, <code>/proxy/carts/test</code>, <code>/proxy/catalog/../../actuator/info</code>, <code>/proxy/catalog/../../actuator/prometheus</code>, <code>/proxy/orders/anything</code>, <code>/proxy/checkout/anything</code> (6)</td>
+<td>El endpoint <code>/proxy/&lt;svc&gt;/...</code> reenvía requests a los backends internos sin validar el path. Permite alcanzar rutas administrativas (<code>/actuator</code>, <code>/debug</code>) y, con <code>..</code>, salir del scope del servicio (traversal) — pivote hacia la red interna del cluster.</td>
 </tr>
 <tr>
 <td>H2</td>
 <td>Inyecciones en checkout (XSS / SQLi / CRLF)</td>
 <td>Alta</td>
 <td>A03</td>
-<td>XSS y SQLi en el form de checkout (cubiertos por CRS)</td>
+<td>El formulario de checkout acepta payloads sin sanitización suficiente. XSS reflejado y SQLi llegan crudos al backend; clásico vector de robo de sesión y manipulación de datos.</td>
 </tr>
 <tr>
 <td>H3</td>
 <td>Endpoint de chat sin validación / prompt injection</td>
 <td>Alta</td>
 <td>A04</td>
-<td><code>POST /chat/submit</code> (feature opcional)</td>
+<td><code>POST /chat/submit</code> (feature opcional) no valida la entrada — superficie para prompt injection si el chat está activo.</td>
 </tr>
 <tr>
 <td>H4</td>
 <td>Spring Actuator expuesto</td>
 <td>Alta</td>
 <td>A05</td>
-<td><code>/actuator/prometheus</code>, <code>/actuator/info</code>, <code>/actuator/metrics</code>, <code>/actuator/health</code> (4)</td>
+<td><code>/actuator/prometheus</code>, <code>/info</code>, <code>/metrics</code>, <code>/env</code> están publicados al exterior. <code>prometheus</code> solo filtra ~19 KB de métricas operativas (memoria, threads, endpoints, versiones) — un mapa completo para el atacante.</td>
 </tr>
 <tr>
 <td>H5</td>
 <td>Confianza incondicional en <code>X-Forwarded-*</code></td>
 <td>Media</td>
 <td>A07</td>
-<td>spoof de IP/proto/host</td>
+<td>nginx confía en los headers <code>X-Forwarded-For/Proto/Host</code> entrantes, permitiendo spoofear IP de origen, esquema y host.</td>
 </tr>
 <tr>
 <td>H6</td>
 <td>Sin rate limit / scanner detection / headers</td>
 <td>Alta</td>
 <td>A04 / A05</td>
-<td>UA de scanners, burst sin límite, 0/6 headers</td>
+<td>Sin límite por IP (enumeración, scraping, fuerza bruta sin freno), sin detección de scanners (<code>sqlmap</code>, <code>nikto</code> operan a cara descubierta) y <strong>0/6 headers de seguridad</strong> (HSTS, X-Frame-Options, CSP, etc.).</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>Los 10 PoCs de la baseline pre-WAF (todos <code>verdict: vuln</code>, 0 bloqueados,
-~53 KB filtrados) están en
-<a href="../evidencias/pocs-data.json"><code>pre-analysis/evidencias/pocs-data.json</code></a>.</p>
-</blockquote>
-<hr />
-<h2>2. Diseño de la solución (recordatorio del diseño aprobado)</h2>
-<p>Se desplegó <strong>ModSecurity v3 + OWASP Core Rule Set (CRS)</strong> dentro del
-<code>ingress-nginx-controller</code> ya presente en el cluster, <strong>sin modificar ni una
-línea de los microservicios</strong>. La imagen oficial
-<code>registry.k8s.io/ingress-nginx/controller:v1.13.x</code> ya trae <code>libmodsecurity</code> y el
-CRS pre-compilados; se activan vía ConfigMap.</p>
-<p>La política se compone de cuatro piezas:</p>
+<p>El más representativo — y el que usamos como caso estrella — es <strong>H4</strong>:
+<code>GET /actuator/prometheus</code> devolvía <code>200 OK</code> con ~19 KB de telemetría interna a
+cualquier cliente anónimo. Es information disclosure de manual (CWE-200) y la
+base de reconocimiento para todo lo demás.</p>
+<hr>
+<h1>Parte 2 · Lo que propusimos en la pre-entrega</h1>
+<h2>2.1 La idea: un WAF en el punto de entrada</h2>
+<p>Propusimos desplegar <strong>ModSecurity v3</strong> (motor de inspección HTTP que registra o
+bloquea requests según reglas) junto con el <strong>OWASP Core Rule Set (CRS)</strong>
+(~reglas mantenidas por OWASP que cubren los ataques web comunes) <strong>dentro del
+<code>ingress-nginx-controller</code> ya presente en el cluster</strong>.</p>
+<p>Cómo funciona en la práctica: cada request entrante pasa primero por
+ModSecurity. El motor parsea URL, headers y body, acumula un puntaje de sospecha
+según cuántas reglas matchean y, si supera el umbral, devuelve <strong>403 Forbidden</strong>
+en lugar de reenviar al backend. <strong>Los cinco microservicios no se enteran del
+cambio</strong>: la política vive entera en configuración del Ingress, no en el código
+de negocio. Un solo lugar para auditar y ajustar.</p>
+<h2>2.2 Etapas de despliegue</h2>
+<ol>
+<li><strong>DetectionOnly</strong> (solo registrar): el WAF anota en el log qué <em>habría</em>
+bloqueado, sin bloquear. Sirve para descubrir y corregir falsos positivos
+sobre tráfico legítimo antes de activar el bloqueo real.</li>
+<li><strong>On</strong> (bloquear): una vez tuneado, el WAF pasa a responder 403 sobre las
+requests maliciosas.</li>
+</ol>
+<h2>2.3 Alcance comprometido</h2>
+<p>Lo que la pre-entrega se comprometió a resolver:</p>
 <ul>
-<li><strong>ConfigMap del controller</strong> — activa <code>enable-modsecurity</code>,
-  <code>enable-owasp-modsecurity-crs</code>, define el motor (<code>SecRuleEngine On</code>), el audit
-  log y el <code>Include</code> de las reglas custom.</li>
-<li><strong>OWASP CRS (Paranoia Level 1)</strong> — cubre traversal, scanners e inyecciones
-  genéricas de capa 7 (XSS, SQLi) sin tocar el código.</li>
-<li><strong>Reglas custom 99001-99020</strong> — para la lógica específica de The Store:
-  Actuator, traversal vía <code>/proxy/**</code>, rutas admin de backends y scanners.</li>
-<li><strong>Anotaciones del Ingress</strong> — <code>limit-rps</code>/<code>limit-connections</code> (rate limiting),
-  <code>more_set_headers</code> (6 headers de seguridad) y CSP en modo Report-Only.</li>
+<li><strong>Bloquear los endpoints de diagnóstico sensibles</strong>: <code>/actuator/info</code>,
+<code>/actuator/metrics</code>, <code>/actuator/prometheus</code> pasan de <code>200 OK</code> a <code>403 Forbidden</code>.</li>
+<li><strong>Cerrar el agujero del proxy</strong>: denegar cualquier request a <code>/proxy/*</code> que
+contenga <code>..</code> en el path <strong>o que no traiga un header de sesión válido</strong>
+(path traversal / SSRF, cubierto por CRS 930xxx + regla custom).</li>
+<li><strong>Detectar y bloquear User-Agents</strong> de herramientas automáticas (<code>sqlmap</code>,
+<code>nikto</code>, <code>nuclei</code>) mediante CRS 913xxx + regla custom.</li>
+<li><strong>Límite de velocidad por IP</strong> aplicado desde el Ingress sobre el tráfico externo.</li>
+<li><strong>Seis headers de seguridad HTTP</strong> en las respuestas servidas por el Ingress.
+La Content-Security-Policy se entregaría en modo Report-Only / permisiva
+mientras se valida compatibilidad con la UI.</li>
+<li><strong>Reglas custom encima del CRS base</strong> para la lógica específica de The Store
+(Actuator, proxy, scanners) — lo que el CRS genérico no puede conocer.</li>
 </ul>
-<hr />
-<h2>3. Arquitectura de red</h2>
+<p>El alcance del cambio quedaba acotado a archivos de configuración (ConfigMap +
+anotaciones del Ingress). <strong>Cero cambios en el código Java, Go o Node.</strong></p>
+<hr>
+<h1>Parte 3 · El diseño de la solución: cómo funciona y por qué cumple</h1>
+<h2>3.1 Arquitectura de red</h2>
 <pre><code class="language-text">Internet / Host (127.0.0.1:80,443)
         │
         ▼
@@ -234,12 +255,25 @@ Ingress host=localhost path=/  ─────────────►  ui:80
 </table>
 <p>El WAF se inserta en el límite <strong>norte-sur</strong> (Internet → cluster). El tráfico
 <strong>este-oeste</strong> (entre pods, p. ej. <code>ui</code> → <code>catalog</code>) NO pasa por el WAF: es una
-limitación consciente del diseño (ver §7).</p>
-<hr />
-<h2>4. Implementación realizada</h2>
-<p>Todo el WAF vive en <a href="../../deploy/waf/"><code>deploy/waf/</code></a> y es <strong>declarativo,
-idempotente y reversible</strong>.</p>
-<h3>4.1 Manifiestos</h3>
+limitación consciente del diseño (ver §3.7).</p>
+<h2>3.2 Componentes de la solución</h2>
+<p>Se desplegó <strong>ModSecurity v3 + OWASP CRS</strong> dentro del <code>ingress-nginx-controller</code>,
+sin modificar ni una línea de los microservicios. La imagen oficial
+<code>registry.k8s.io/ingress-nginx/controller:v1.13.x</code> ya trae <code>libmodsecurity</code> y el
+CRS pre-compilados; se activan vía ConfigMap. La política se compone de cuatro piezas:</p>
+<ul>
+<li><strong>ConfigMap del controller</strong> — activa <code>enable-modsecurity</code> y
+<code>enable-owasp-modsecurity-crs</code>, define el motor (<code>SecRuleEngine On</code>), el audit
+log y el <code>Include</code> de las reglas custom.</li>
+<li><strong>OWASP CRS (Paranoia Level 1)</strong> — cubre traversal, scanners e inyecciones
+genéricas de capa 7 (XSS, SQLi) sin tocar el código.</li>
+<li><strong>Reglas custom 99001-99020</strong> — para la lógica específica de The Store:
+Actuator, traversal vía <code>/proxy/**</code>, rutas admin de backends y scanners.</li>
+<li><strong>Anotaciones del Ingress</strong> — <code>limit-rps</code>/<code>limit-connections</code> (rate limiting),
+<code>more_set_headers</code> (6 headers de seguridad) y CSP en modo Report-Only.</li>
+</ul>
+<h3>3.2.1 Manifiestos</h3>
+<p>Todo el WAF vive en <code>deploy/waf/</code> y es <strong>declarativo, idempotente y reversible</strong>.</p>
 <table>
 <thead>
 <tr>
@@ -270,7 +304,7 @@ idempotente y reversible</strong>.</p>
 </tr>
 </tbody>
 </table>
-<h3>4.2 Reglas custom (rango 99000-99999, reservado por CRS para el usuario)</h3>
+<h3>3.2.2 Reglas custom (rango 99000-99999, reservado por CRS para el usuario)</h3>
 <table>
 <thead>
 <tr>
@@ -285,7 +319,7 @@ idempotente y reversible</strong>.</p>
 <td><strong>99001</strong></td>
 <td>H4 · Actuator</td>
 <td><code>deny 403</code></td>
-<td>Bloquea <code>/actuator/{info,metrics,prometheus,env,heapdump,…}</code> directo y vía proxy, <strong>más el índice <code>/actuator</code></strong> (que lista en HAL todos los endpoints disponibles). <strong>Excluye <code>health</code></strong> (lo usan los probes de K8s).</td>
+<td>Bloquea <code>/actuator/{info,metrics,prometheus,env,heapdump,…}</code> directo y vía proxy, más el índice <code>/actuator</code> (que lista en HAL todos los endpoints disponibles). Excluye <code>health</code> (lo usan los probes de K8s).</td>
 </tr>
 <tr>
 <td><strong>99002</strong></td>
@@ -297,7 +331,7 @@ idempotente y reversible</strong>.</p>
 <td><strong>99003</strong></td>
 <td>H1 · admin vía proxy</td>
 <td><code>deny 403</code></td>
-<td><code>/proxy/&lt;svc&gt;/(actuator\|debug\|management\|admin)</code>.</td>
+<td><code>/proxy/&lt;svc&gt;/(actuator|debug|management|admin)</code>.</td>
 </tr>
 <tr>
 <td><strong>99004</strong></td>
@@ -325,40 +359,71 @@ idempotente y reversible</strong>.</p>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p><strong>Reglas 99004/99005 · la segunda rama del cierre del proxy.</strong> La pre-entrega
-comprometió denegar <code>/proxy/*</code> que tuviera <code>..</code> <strong>o</strong> que "no trajera header de
-sesión válido". La primera rama la cubre 99002; estas dos cierran la segunda.
-La app emite una cookie <code>SESSIONID</code> (UUID) en la primera visita a <code>/</code>
-(<code>SessionIDWebFilter</code>), y el front <strong>nunca</strong> invoca <code>/proxy/*</code> desde el
-navegador — así que exigir la cookie no rompe ningún flujo legítimo, sólo corta
-el acceso directo por curl/scanner. Limitación honesta: un atacante puede
-fabricar una <code>SESSIONID</code> con formato UUID; la validación criptográfica de la
-sesión es responsabilidad de la app, no del WAF. La regla eleva la barrera y
-cubre el caso por defecto.</p>
-</blockquote>
 <p>Las inyecciones de H2 (XSS/SQLi) <strong>no necesitaron regla custom</strong>: las cubre el CRS
 base (familias <code>941xxx</code>, <code>942xxx</code>, scoring <code>949110</code>). Esto valida la decisión de
 diseño: <strong>CRS para lo genérico + reglas custom para lo específico de la app</strong>.</p>
-<h3>4.3 Integración en <code>local.sh</code></h3>
-<p>El WAF dejó de instalarse "aparte": se integró en el orquestador raíz siguiendo
-el estilo existente (<code>cmd_*</code>, <code>print_status</code>, verificación de prerequisitos):</p>
+<h3>3.2.3 Integración en <code>local.sh</code></h3>
+<p>El WAF se integró en el orquestador raíz siguiendo el estilo existente:</p>
 <ul>
-<li><code>./local.sh install-waf</code> y <code>./local.sh uninstall-waf</code> — wrappers que validan que
-  el cluster y el namespace existan antes de delegar en <code>deploy/waf/install.sh</code>
-  (o <code>uninstall.sh</code>), pasando el namespace correcto vía <code>APP_NS</code>.</li>
+<li><code>./local.sh install-waf</code> y <code>./local.sh uninstall-waf</code> — wrappers que validan
+cluster y namespace antes de delegar en <code>deploy/waf/install.sh</code> (o <code>uninstall.sh</code>).</li>
 <li><code>./local.sh create-cluster --with-waf</code> — levanta el cluster, despliega la app y
-  deja el WAF instalado en un solo comando. El WAF se instala <strong>después</strong> de los
-  e2e tests a propósito: el rate limit (10 rps/IP) podría throttlear el tráfico
-  legítimo de la suite.</li>
+deja el WAF instalado en un solo comando. El WAF se instala <strong>después</strong> de los
+e2e tests a propósito: el rate limit (10 rps/IP) podría throttlear el tráfico
+legítimo de la suite.</li>
 </ul>
-<hr />
-<h2>5. Resultados (medición real sobre el cluster)</h2>
+<h2>3.3 Cómo el diseño soluciona cada hallazgo</h2>
+<table>
+<thead>
+<tr>
+<th>Hallazgo</th>
+<th>Cómo lo soluciona el WAF</th>
+<th>Resultado medido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1 · SSRF / traversal <code>/proxy/**</code></td>
+<td>Reglas 99002 (<code>..</code>/encoding) + 99003 (rutas admin) + 99004/99005 (exige cookie de sesión válida). El front nunca llama <code>/proxy/*</code>, así que sólo se corta el acceso directo de un atacante.</td>
+<td><code>200</code> → <code>403</code></td>
+</tr>
+<tr>
+<td>H2 · XSS / SQLi en checkout</td>
+<td>CRS base: <code>941xxx</code> (XSS, libinjection), <code>942xxx</code> (SQLi), scoring <code>949110</code>. Sin regla custom.</td>
+<td><code>200</code> → <code>403</code></td>
+</tr>
+<tr>
+<td>H4 · Actuator expuesto</td>
+<td>Regla 99001: bloquea endpoints sensibles <strong>y el índice <code>/actuator</code></strong>, preservando <code>/actuator/health</code> para los probes de K8s.</td>
+<td><code>200</code> (~19 KB) → <code>403</code></td>
+</tr>
+<tr>
+<td>H5 · <code>X-Forwarded-*</code> spoofeable</td>
+<td><code>use-forwarded-headers: false</code> en el ConfigMap: nginx ignora los XFF entrantes.</td>
+<td>vector cerrado</td>
+</tr>
+<tr>
+<td>H6 · scanners</td>
+<td>Regla 99010 + CRS 913xxx: bloquea User-Agents de herramientas conocidas.</td>
+<td><code>200</code> → <code>403</code></td>
+</tr>
+<tr>
+<td>H6 · sin rate limit</td>
+<td>Anotaciones <code>limit-rps: 10</code> + <code>limit-burst-multiplier: 3</code> (nginx <code>limit_req</code>, leaky bucket), respuesta <code>429</code>.</td>
+<td>100×<code>200</code> → mayoría <code>429</code></td>
+</tr>
+<tr>
+<td>H6 · sin headers</td>
+<td><code>more_set_headers</code> aplica los 6 headers en todas las respuestas (incluidas 4xx/5xx).</td>
+<td>0/6 → 6/6</td>
+</tr>
+</tbody>
+</table>
+<h2>3.4 Verificación: por qué cumple con lo propuesto</h2>
+<h3>3.4.1 Antes / después de los casos comprometidos</h3>
 <p>Corrida end-to-end real sobre Kind. Baseline pre-WAF y verificación post-WAF
-capturados el mismo día contra <code>http://localhost</code>. Evidencia versionada en
-<a href="../evidencias/post-waf/"><code>pre-analysis/evidencias/post-waf/</code></a> (incluye el audit
-log de ModSecurity).</p>
-<h3>5.1 Tabla pre/post de los 5 casos comprometidos</h3>
+capturados contra <code>http://localhost</code>. Evidencia versionada en
+<code>pre-analysis/evidencias/post-waf/</code> (incluye el audit log de ModSecurity).</p>
 <table>
 <thead>
 <tr>
@@ -379,27 +444,41 @@ log de ModSecurity).</p>
 </tr>
 <tr>
 <td>2</td>
+<td><code>GET /actuator</code> (índice HAL)</td>
+<td><code>200 OK</code></td>
+<td><strong><code>403</code></strong></td>
+<td>regla custom <code>99001</code></td>
+</tr>
+<tr>
+<td>3</td>
 <td>Path traversal <code>/proxy/catalog/../../actuator/info</code></td>
 <td><code>200 OK</code></td>
 <td><strong><code>403</code></strong></td>
 <td>regla custom <code>99002</code></td>
 </tr>
 <tr>
-<td>3</td>
+<td>4</td>
+<td><code>GET /proxy/carts/test</code> sin cookie de sesión</td>
+<td><code>200 OK</code> (fuga datos)</td>
+<td><strong><code>403</code></strong></td>
+<td>reglas custom <code>99004</code>/<code>99005</code></td>
+</tr>
+<tr>
+<td>5</td>
 <td><code>User-Agent: Nikto / sqlmap / nuclei</code></td>
 <td><code>200 OK</code></td>
 <td><strong><code>403</code></strong></td>
 <td>regla custom <code>99010</code></td>
 </tr>
 <tr>
-<td>4</td>
+<td>6</td>
 <td>Burst de 100 requests concurrentes a <code>/</code></td>
 <td>100/100 → <code>200</code></td>
-<td><strong>23/100 → <code>429</code></strong></td>
+<td><strong>mayoría → <code>429</code></strong></td>
 <td>nginx <code>limit_req</code> (10 rps + burst×3)</td>
 </tr>
 <tr>
-<td>5</td>
+<td>7</td>
 <td>Headers de seguridad en la home</td>
 <td>0/6 presentes</td>
 <td><strong>6/6 presentes</strong></td>
@@ -407,16 +486,16 @@ log de ModSecurity).</p>
 </tr>
 </tbody>
 </table>
-<p><strong>Los 5 casos pasan de vulnerable a mitigado</strong>, y el tráfico legítimo se
+<p><strong>Todos los casos pasan de vulnerable a mitigado</strong>, y el tráfico legítimo se
 preserva: <code>GET /</code> y <code>GET /actuator/health</code> siguen respondiendo <code>200</code>.</p>
-<h3>5.2 Suite automatizada</h3>
+<h3>3.4.2 Suite automatizada</h3>
 <p><code>pre-analysis/tests/02-post-waf-attacks.sh</code> (espejo del test pre-WAF con las
 assertions invertidas) verifica bloqueos <strong>y</strong> que la app legítima siga viva:</p>
 <pre><code class="language-text">RESUMEN · TESTS POST-WAF
   Pasaron:  27 / 27
   Fallaron: 0 / 27
 </code></pre>
-<h3>5.3 Defensa en profundidad confirmada en el audit log</h3>
+<h3>3.4.3 Defensa en profundidad confirmada en el audit log</h3>
 <table>
 <thead>
 <tr>
@@ -429,7 +508,7 @@ assertions invertidas) verifica bloqueos <strong>y</strong> que la app legítima
 <tr>
 <td>Custom</td>
 <td><code>99001</code></td>
-<td><code>/actuator/{info,metrics,prometheus,env}</code></td>
+<td><code>/actuator/{info,metrics,prometheus,env}</code> + índice</td>
 </tr>
 <tr>
 <td>Custom</td>
@@ -468,90 +547,149 @@ assertions invertidas) verifica bloqueos <strong>y</strong> que la app legítima
 </tr>
 </tbody>
 </table>
-<hr />
-<h2>6. Problemas encontrados durante el tuning</h2>
-<p>Lo que costó hacer funcionar — y cómo se resolvió. Esta sección es la más honesta
-del trabajo y resume el aprendizaje real.</p>
+<h3>3.4.4 Trazabilidad: pre-entrega → implementación</h3>
+<p>Cada compromiso de la pre-entrega tiene su correlato en la implementación y un
+test que lo valida:</p>
+<table>
+<thead>
+<tr>
+<th>Comprometido en la pre-entrega</th>
+<th>Implementado en</th>
+<th>Test que lo valida</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bloquear <code>/actuator/{info,metrics,prometheus}</code></td>
+<td>regla 99001</td>
+<td><code>02-post-waf-attacks.sh</code> H4.a/c/d + H4.a2 (índice)</td>
+</tr>
+<tr>
+<td><code>/proxy/*</code> con <code>..</code> → bloqueado</td>
+<td>regla 99002</td>
+<td>H1.a/c/d</td>
+</tr>
+<tr>
+<td><code>/proxy/*</code> sin sesión válida → bloqueado</td>
+<td>reglas 99004/99005</td>
+<td>H1.e/f/g</td>
+</tr>
+<tr>
+<td>Rutas admin de backend vía proxy</td>
+<td>regla 99003</td>
+<td>H1.b</td>
+</tr>
+<tr>
+<td>User-Agents de scanners</td>
+<td>regla 99010 + CRS 913xxx</td>
+<td>H6.a/b/c</td>
+</tr>
+<tr>
+<td>Inyecciones XSS / SQLi</td>
+<td>CRS 941xxx / 942xxx</td>
+<td>H2.a/b</td>
+</tr>
+<tr>
+<td>Rate limit por IP</td>
+<td>anotaciones <code>limit-*</code></td>
+<td>test de burst (76/100 → 429)</td>
+</tr>
+<tr>
+<td>6 headers de seguridad (CSP Report-Only)</td>
+<td><code>more_set_headers</code></td>
+<td>test de headers (6/6)</td>
+</tr>
+<tr>
+<td>Sin tocar código de los microservicios</td>
+<td>sólo <code>deploy/waf/</code> (config)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2>3.5 Problemas encontrados durante el tuning</h2>
+<p>Lo que costó hacer funcionar — y cómo se resolvió. El aprendizaje real del trabajo.</p>
 <ol>
 <li>
 <p><strong>Comillas simples rompían el parseo de nginx.</strong> <code>ingress-nginx</code> envuelve el
-   <code>modsecurity-snippet</code> en <code>modsecurity_rules '...'</code> (comillas simples). Cualquier
-   <code>'</code> dentro de una regla (p. ej. <code>msg:'...'</code>) cerraba el string y rompía nginx.
-   <strong>Solución:</strong> mover las reglas custom a un archivo aparte
-   (<code>rules/the-store.conf</code>) montado como volumen y cargado con <code>Include</code>; en un
-   Include ModSecurity parsea directo y las comillas conviven sin problema.</p>
+<code>modsecurity-snippet</code> en <code>modsecurity_rules '...'</code> (comillas simples). Cualquier
+<code>'</code> dentro de una regla (p. ej. <code>msg:'...'</code>) cerraba el string y rompía nginx.
+<strong>Solución:</strong> mover las reglas custom a un archivo aparte
+(<code>rules/the-store.conf</code>) montado como volumen y cargado con <code>Include</code>.</p>
 </li>
 <li>
 <p><strong><code>libmodsecurity</code> v3 es quisquilloso con las continuaciones de línea.</strong> Las
-   reglas multi-línea con <code>\</code> a veces cortaban la lista de acciones a la mitad.
-   <strong>Solución:</strong> una <code>SecRule</code> por línea física (largas pero a prueba de balas).</p>
+reglas multi-línea con <code>\</code> a veces cortaban la lista de acciones a la mitad.
+<strong>Solución:</strong> una <code>SecRule</code> por línea física (largas pero a prueba de balas).</p>
 </li>
 <li>
 <p><strong>Falso positivo del CRS sobre <code>Host</code> numérico.</strong> En el POC local el <code>Host</code>
-   es <code>127.0.0.1</code>/<code>localhost</code>, y la regla CRS <code>920350</code> ("Host header is a numeric
-   IP address") disparaba sobre tráfico legítimo. <strong>Solución:</strong> regla custom
-   <code>99020</code> que hace <code>ctl:ruleRemoveById=920350</code> <strong>sólo</strong> cuando el Host es
-   localhost — una whitelist quirúrgica, no un apagado global.</p>
+es <code>127.0.0.1</code>/<code>localhost</code>, y la regla CRS <code>920350</code> disparaba sobre tráfico
+legítimo. <strong>Solución:</strong> regla custom <code>99020</code> que hace <code>ctl:ruleRemoveById=920350</code>
+<strong>sólo</strong> cuando el Host es localhost — una whitelist quirúrgica, no un apagado global.</p>
 </li>
 <li>
-<p><strong>El rate limit "no funcionaba"… hasta mandar requests concurrentes.</strong> Un loop
-   secuencial de curls es demasiado lento (cada request tarda) y queda por debajo
-   de 10 rps, así que nunca dispara el <code>429</code>. <strong>Solución:</strong> lanzar el burst con
-   concurrencia real (<code>xargs -P 50</code>) para agotar el burst (10·3=30) y throttlear
-   el resto.</p>
+<p><strong>El rate limit &quot;no funcionaba&quot;… hasta mandar requests concurrentes.</strong> Un loop
+secuencial de curls queda por debajo de 10 rps y nunca dispara el <code>429</code>.
+<strong>Solución:</strong> lanzar el burst con concurrencia real (<code>xargs -P 50</code>).</p>
 </li>
 <li>
 <p><strong>El traversal daba <code>404</code> en vez de <code>403</code>.</strong> <code>curl</code> normaliza el <code>../</code> del lado
-   cliente antes de enviarlo, así que el <code>..</code> literal nunca llegaba al WAF.
-   <strong>Solución:</strong> usar <code>curl --path-as-is</code> para que el <code>..</code> viaje crudo y dispare
-   la regla <code>99002</code>.</p>
+cliente antes de enviarlo. <strong>Solución:</strong> usar <code>curl --path-as-is</code> para que el
+<code>..</code> viaje crudo y dispare la regla <code>99002</code>.</p>
+</li>
+<li>
+<p><strong>El header <code>Cookie</code> ausente no disparaba la regla de sesión.</strong> libmodsecurity
+v3 no itera sobre una variable de colección ausente, así que un <code>!@rx</code> sobre
+<code>REQUEST_HEADERS:Cookie</code> no se ejecuta cuando no hay ningún Cookie — justo el
+caso del atacante con curl directo. <strong>Solución:</strong> separar en dos reglas — 99004
+(cookie presente pero inválida, con <code>!@rx</code>) y 99005 (header ausente, con
+<code>&amp;REQUEST_HEADERS:Cookie @eq 0</code>).</p>
 </li>
 <li>
 <p><strong>No romper la UI con la CSP.</strong> Una <code>Content-Security-Policy</code> estricta rompía
-   estilos/scripts inline de la UI. <strong>Solución:</strong> entregarla en modo
-   <strong>Report-Only</strong> (observa y reporta violaciones sin bloquear); el clickjacking
-   igual queda cubierto por <code>X-Frame-Options</code>, que sí aplica.</p>
+estilos/scripts inline de la UI. <strong>Solución:</strong> entregarla en modo
+<strong>Report-Only</strong>; el clickjacking igual queda cubierto por <code>X-Frame-Options</code>.</p>
 </li>
 <li>
 <p><strong>No tumbar el pod del UI.</strong> Un bloqueo ciego de <code>/actuator/*</code> también
-   bloqueaba <code>/actuator/health</code>, que Kubernetes usa para los probes de
-   readiness/liveness — bloquearlo reiniciaría el pod en loop. <strong>Solución:</strong> la
-   regla <code>99001</code> excluye explícitamente <code>health</code>.</p>
-</li>
-<li>
-<p><strong>Persistencia del audit log.</strong> El controller tiene <code>readOnlyRootFilesystem</code>
-   en varios paths; <code>/tmp</code> siempre es escribible. <strong>Solución:</strong> escribir el audit
-   log en <code>/tmp/modsec_audit.log</code> y extraerlo con <code>kubectl exec ... tail</code> para la
-   demo, sin montar un volumen extra.</p>
+bloqueaba <code>/actuator/health</code>, que K8s usa para los probes — bloquearlo
+reiniciaría el pod en loop. <strong>Solución:</strong> la regla <code>99001</code> excluye <code>health</code>.</p>
 </li>
 </ol>
-<hr />
-<h2>7. Limitaciones honestas y trabajo futuro</h2>
+<h2>3.6 Demostración en vivo</h2>
+<p>El repo incluye una <strong>demo web</strong> (<code>deploy/waf/demo-web/</code>) que levanta una página
+local desde la que se pueden lanzar los ataques contra el cluster, ver el código
+de cada uno, su output real (status + respuesta), y togglear el WAF para repetir
+la suite con el firewall levantado. Es la versión interactiva de los scripts
+<code>pre-analysis/tests/01-pre-waf-attacks.sh</code> y <code>02-post-waf-attacks.sh</code>. Ver
+<code>deploy/waf/demo-web/README.md</code> para levantarla.</p>
+<h2>3.7 Limitaciones honestas y trabajo futuro</h2>
 <ul>
-<li><strong>Un WAF no reemplaza código seguro.</strong> Es defensa en profundidad, no una bala
-  de plata. Las vulnerabilidades de fondo (el <code>ProxyController</code> sin sanitizar, la
-  validación parcial del checkout) siguen en el código; el WAF las contiene en el
-  perímetro.</li>
-<li><strong>Sólo cubre el tráfico norte-sur.</strong> El tráfico este-oeste entre pods
-  (<code>ui</code> → <code>catalog</code>/<code>carts</code>/…) no pasa por el Ingress, así que el WAF no lo ve.
-  Mitigarlo requeriría un service mesh (mTLS + sidecars) o NetworkPolicies.</li>
+<li><strong>Un WAF no reemplaza código seguro.</strong> Es defensa en profundidad. Las
+vulnerabilidades de fondo (el <code>ProxyController</code> sin sanitizar, la validación
+parcial del checkout) siguen en el código; el WAF las contiene en el perímetro.</li>
+<li><strong>Sólo cubre el tráfico norte-sur.</strong> El tráfico este-oeste entre pods no pasa
+por el Ingress. Mitigarlo requeriría un service mesh (mTLS + sidecars) o
+NetworkPolicies.</li>
+<li><strong>La sesión del proxy no es criptográfica.</strong> Las reglas 99004/99005 exigen una
+cookie <code>SESSIONID</code> con formato UUID; un atacante puede fabricar una. Validar la
+sesión de verdad es responsabilidad de la app — el WAF eleva la barrera y cubre
+el caso por defecto (curl/scanner sin cookie).</li>
 <li><strong>Bypass por encoding.</strong> Doble/triple URL-encode, Unicode raro o JSON con keys
-  inesperadas son un campo activo de evasión de WAFs basados en firmas.</li>
+inesperadas son un campo activo de evasión de WAFs basados en firmas.</li>
 <li><strong>Falsos positivos a Paranoia Levels altos.</strong> Quedamos en PL1 para la demo; PL2+
-  requeriría una ronda de tuning más larga sobre los endpoints legítimos.</li>
-<li><strong>HTTPS termina en el WAF.</strong> Si la terminación TLS estuviera antes (otro proxy),
-  el WAF no vería el contenido. En este POC TLS termina en el Ingress, así que OK.</li>
+requeriría una ronda de tuning más larga sobre los endpoints legítimos.</li>
 <li><strong>CSP en Report-Only</strong> observa pero no bloquea; pasar a enforcement requiere
-  validar antes que la UI no rompa.</li>
+validar antes que la UI no rompa.</li>
 <li><strong>Ataques de lógica de negocio</strong> (abusar de un cupón N veces) un WAF de reglas
-  no los detecta; requieren reglas de negocio o bot management.</li>
+no los detecta; requieren reglas de negocio o bot management.</li>
 </ul>
 <p><strong>Trabajo futuro:</strong> subir a PL2 con tuning, evaluar <strong>Coraza</strong> (sucesor de
 ModSec en Go, compatible con CRS), agregar NetworkPolicies para el este-oeste y
 enforcement real de la CSP.</p>
-<hr />
-<h2>8. Conclusión</h2>
-<p>El POC cumple el criterio de éxito de la pre-entrega: <strong>los 10 vectores hoy
+<hr>
+<h1>Conclusión</h1>
+<p>El POC cumple el criterio de éxito de la pre-entrega: <strong>los vectores hoy
 explotables en el punto de entrada HTTP quedaron detectados o bloqueados por el
 WAF, sin romper el acceso normal</strong> a la home, el catálogo, el carrito ni el
 checkout (<code>27/27</code> tests post-WAF en verde, <code>/</code> y <code>/actuator/health</code> siguen en
@@ -560,11 +698,12 @@ checkout (<code>27/27</code> tests post-WAF en verde, <code>/</code> y <code>/ac
 custom sólo para la lógica propia de The Store</strong> — se validó en la práctica: el
 CRS resolvió las inyecciones genéricas (XSS/SQLi) sin una sola línea custom,
 mientras que las 7 reglas propias cubrieron lo que el CRS no conoce (Actuator,
-proxy traversal, scanners). Todo quedó <strong>declarativo, idempotente y reversible</strong>,
-integrado en <code>local.sh</code> y reproducible desde cero siguiendo el
-<a href="../../deploy/waf/HOWTO.md">HOWTO</a>.</p>
+proxy traversal, proxy sin sesión, scanners). Todo quedó <strong>declarativo,
+idempotente y reversible</strong>, integrado en <code>local.sh</code> y reproducible desde cero
+siguiendo el <a href="../../deploy/waf/HOWTO.md">HOWTO</a>.</p>
 <p>El mayor aprendizaje no fue escribir reglas, sino <strong>operar el WAF</strong>: el tuning
 (comillas, falsos positivos, no tumbar los probes, no romper la UI) es donde se
 juega que un WAF sea útil en vez de un estorbo.</p>
+
 </body>
 </html>
