@@ -262,7 +262,7 @@ idempotente y reversible</strong>.</p>
 </tr>
 <tr>
 <td><code>rules/the-store.conf</code></td>
-<td>Las 5 reglas custom (99001-99020).</td>
+<td>Las 7 reglas custom (99001-99020).</td>
 </tr>
 <tr>
 <td><code>install.sh</code> / <code>uninstall.sh</code></td>
@@ -285,7 +285,7 @@ idempotente y reversible</strong>.</p>
 <td><strong>99001</strong></td>
 <td>H4 · Actuator</td>
 <td><code>deny 403</code></td>
-<td>Bloquea <code>/actuator/{info,metrics,prometheus,env,heapdump,…}</code> directo y vía proxy. <strong>Excluye <code>health</code></strong> (lo usan los probes de K8s).</td>
+<td>Bloquea <code>/actuator/{info,metrics,prometheus,env,heapdump,…}</code> directo y vía proxy, <strong>más el índice <code>/actuator</code></strong> (que lista en HAL todos los endpoints disponibles). <strong>Excluye <code>health</code></strong> (lo usan los probes de K8s).</td>
 </tr>
 <tr>
 <td><strong>99002</strong></td>
@@ -298,6 +298,18 @@ idempotente y reversible</strong>.</p>
 <td>H1 · admin vía proxy</td>
 <td><code>deny 403</code></td>
 <td><code>/proxy/&lt;svc&gt;/(actuator\|debug\|management\|admin)</code>.</td>
+</tr>
+<tr>
+<td><strong>99004</strong></td>
+<td>H1 · proxy sin sesión</td>
+<td><code>deny 403</code></td>
+<td><code>/proxy/*</code> con cookie <code>SESSIONID</code> presente pero sin formato UUID válido (chain).</td>
+</tr>
+<tr>
+<td><strong>99005</strong></td>
+<td>H1 · proxy sin sesión</td>
+<td><code>deny 403</code></td>
+<td><code>/proxy/*</code> sin ningún header <code>Cookie</code> (chain con <code>&amp;...@eq 0</code>). Cubre el acceso directo por curl/scanner, que 99004 no ve porque libmodsecurity v3 no itera sobre una colección ausente.</td>
 </tr>
 <tr>
 <td><strong>99010</strong></td>
@@ -313,6 +325,18 @@ idempotente y reversible</strong>.</p>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p><strong>Reglas 99004/99005 · la segunda rama del cierre del proxy.</strong> La pre-entrega
+comprometió denegar <code>/proxy/*</code> que tuviera <code>..</code> <strong>o</strong> que "no trajera header de
+sesión válido". La primera rama la cubre 99002; estas dos cierran la segunda.
+La app emite una cookie <code>SESSIONID</code> (UUID) en la primera visita a <code>/</code>
+(<code>SessionIDWebFilter</code>), y el front <strong>nunca</strong> invoca <code>/proxy/*</code> desde el
+navegador — así que exigir la cookie no rompe ningún flujo legítimo, sólo corta
+el acceso directo por curl/scanner. Limitación honesta: un atacante puede
+fabricar una <code>SESSIONID</code> con formato UUID; la validación criptográfica de la
+sesión es responsabilidad de la app, no del WAF. La regla eleva la barrera y
+cubre el caso por defecto.</p>
+</blockquote>
 <p>Las inyecciones de H2 (XSS/SQLi) <strong>no necesitaron regla custom</strong>: las cubre el CRS
 base (familias <code>941xxx</code>, <code>942xxx</code>, scoring <code>949110</code>). Esto valida la decisión de
 diseño: <strong>CRS para lo genérico + reglas custom para lo específico de la app</strong>.</p>
@@ -389,8 +413,8 @@ preserva: <code>GET /</code> y <code>GET /actuator/health</code> siguen respondi
 <p><code>pre-analysis/tests/02-post-waf-attacks.sh</code> (espejo del test pre-WAF con las
 assertions invertidas) verifica bloqueos <strong>y</strong> que la app legítima siga viva:</p>
 <pre><code class="language-text">RESUMEN · TESTS POST-WAF
-  Pasaron:  23 / 23
-  Fallaron: 0 / 23
+  Pasaron:  27 / 27
+  Fallaron: 0 / 27
 </code></pre>
 <h3>5.3 Defensa en profundidad confirmada en el audit log</h3>
 <table>
@@ -416,6 +440,11 @@ assertions invertidas) verifica bloqueos <strong>y</strong> que la app legítima
 <td>Custom</td>
 <td><code>99003</code></td>
 <td><code>/proxy/&lt;svc&gt;/actuator</code> (ruta admin vía proxy)</td>
+</tr>
+<tr>
+<td>Custom</td>
+<td><code>99004/99005</code></td>
+<td><code>/proxy/*</code> sin cookie <code>SESSIONID</code> válida (acceso directo curl/scanner)</td>
 </tr>
 <tr>
 <td>Custom</td>
@@ -525,12 +554,12 @@ enforcement real de la CSP.</p>
 <p>El POC cumple el criterio de éxito de la pre-entrega: <strong>los 10 vectores hoy
 explotables en el punto de entrada HTTP quedaron detectados o bloqueados por el
 WAF, sin romper el acceso normal</strong> a la home, el catálogo, el carrito ni el
-checkout (<code>23/23</code> tests post-WAF en verde, <code>/</code> y <code>/actuator/health</code> siguen en
+checkout (<code>27/27</code> tests post-WAF en verde, <code>/</code> y <code>/actuator/health</code> siguen en
 <code>200</code>).</p>
 <p>La decisión arquitectural clave — <strong>ModSecurity + CRS en el Ingress, con reglas
 custom sólo para la lógica propia de The Store</strong> — se validó en la práctica: el
 CRS resolvió las inyecciones genéricas (XSS/SQLi) sin una sola línea custom,
-mientras que las 5 reglas propias cubrieron lo que el CRS no conoce (Actuator,
+mientras que las 7 reglas propias cubrieron lo que el CRS no conoce (Actuator,
 proxy traversal, scanners). Todo quedó <strong>declarativo, idempotente y reversible</strong>,
 integrado en <code>local.sh</code> y reproducible desde cero siguiendo el
 <a href="../../deploy/waf/HOWTO.md">HOWTO</a>.</p>
