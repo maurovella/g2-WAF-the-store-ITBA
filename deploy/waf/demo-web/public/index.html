@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo WAF · The Store · TPE Tema 9</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#14233b; --muted:#5b6b82;
+    --navy:#0e2148; --teal:#1c7293; --green:#2fae66; --red:#d64545; --amber:#f4a100;
+    --line:#e2e8f3; --code:#0d1b2a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 24px 80px}
+  header h1{font-size:30px;margin:0 0 4px;letter-spacing:-.4px}
+  header p{margin:0;color:var(--muted);font-size:15px}
+  .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:24px 0}
+  .state{display:flex;align-items:center;gap:12px}
+  .dot{width:10px;height:10px;border-radius:50%;background:#bbb}
+  .dot.on{background:var(--green);box-shadow:0 0 0 4px rgba(47,174,102,.18)}
+  .dot.off{background:var(--red);box-shadow:0 0 0 4px rgba(214,69,69,.16)}
+  .state b{font-size:15px}
+  .state small{color:var(--muted);display:block;font-size:12px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:#fff;
+    color:var(--ink);padding:9px 14px;border-radius:10px;cursor:pointer;transition:.12s}
+  button:hover{border-color:#c7d2e6;background:#f7f9fd}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  button.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+  button.primary:hover{background:#16305f}
+  button.teal{background:var(--teal);color:#fff;border-color:var(--teal)}
+  button.danger{background:#fff;color:var(--red);border-color:#ecc4c4}
+  button.danger:hover{background:#fdf3f3}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .chead{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
+  .tag{font-size:11px;font-weight:700;letter-spacing:.5px;padding:3px 8px;border-radius:999px;
+    background:#eef2fb;color:var(--teal);white-space:nowrap}
+  .card h3{margin:0 0 2px;font-size:17px}
+  .why{color:var(--muted);font-size:13.5px;margin:6px 0 12px}
+  pre{margin:0 0 12px;background:var(--code);color:#dbe7ff;border-radius:10px;padding:12px 14px;
+    font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .meta{font-size:12px;color:var(--muted)}
+  .meta code{background:#eef2fb;padding:1px 6px;border-radius:5px;color:var(--teal);font-size:11.5px}
+  .result{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;display:none}
+  .result.show{display:block}
+  .verdict{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;padding:4px 0}
+  .verdict .code{font-family:ui-monospace,monospace;background:#eef2fb;color:var(--ink);padding:2px 8px;border-radius:6px}
+  .v-blocked{color:var(--green)} .v-vuln{color:var(--red)} .v-run{color:var(--muted)}
+  .obody{margin-top:8px;background:#0d1b2a;color:#9fb4d6;border-radius:8px;padding:10px 12px;
+    font-family:ui-monospace,monospace;font-size:11.5px;white-space:pre-wrap;max-height:160px;overflow:auto}
+  .spin{display:inline-block;width:13px;height:13px;border:2px solid #cbd5e6;border-top-color:var(--teal);border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .note{font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;
+    padding:12px 18px;border-radius:10px;font-size:13.5px;box-shadow:0 8px 30px rgba(14,33,72,.3);display:none;max-width:90%}
+  .toast.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🛡️ Demo WAF · The Store</h1>
+    <p>TPE Tema 9 · Redes · ITBA · Grupo 2 — lanzá los ataques reales contra el cluster y mirá el antes/después.</p>
+  </header>
+
+  <div class="bar">
+    <div class="state">
+      <span class="dot" id="dot"></span>
+      <div><b id="stateText">Consultando estado…</b><small id="stateSub">target: —</small></div>
+    </div>
+    <div class="actions">
+      <button class="teal" id="runAll">▶ Correr toda la suite</button>
+      <button id="btnInstall">Instalar WAF</button>
+      <button class="danger" id="btnUninstall">Desinstalar WAF</button>
+      <button id="btnRefresh" title="Refrescar estado">↻</button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <p class="note">Cada botón ejecuta el <b>mismo curl</b> que la suite <code>pre-analysis/tests/</code>, contra el cluster real. Instalar/desinstalar el WAF tarda ~30&nbsp;s (reinicia el controller).</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s,el=document)=>el.querySelector(s);
+let WAF_ON = null, TARGET = "";
+
+function toast(msg, ms=3500){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),ms); }
+
+async function loadState(){
+  try{
+    const s = await (await fetch("/api/state")).json();
+    WAF_ON = s.wafActive; TARGET = s.target;
+    const dot=$("#dot");
+    dot.className = "dot " + (s.wafActive ? "on" : "off");
+    $("#stateText").textContent = s.wafActive ? "WAF ACTIVO (bloqueando)" : "WAF DESACTIVADO (app vulnerable)";
+    $("#stateSub").textContent = "target: " + s.target;
+  }catch(e){ $("#stateText").textContent="No se pudo consultar el estado"; }
+}
+
+function verdict(a, r){
+  // Mitigado = bueno (verde). Pasó/vulnerable = malo (rojo).
+  if (r.blocked) return {cls:"v-blocked", txt: a.type==="headers" ? "MITIGADO · 6/6 headers" : "BLOQUEADO por el WAF"};
+  if (a.type==="headers") return {cls:"v-vuln", txt:`SIN PROTECCIÓN · ${r.headersPresent||0}/6 headers`};
+  return {cls:"v-vuln", txt: "PASÓ — la app es vulnerable"};
+}
+
+function renderResult(card, a, r){
+  const res = $(".result", card); res.classList.add("show");
+  const v = verdict(a, r);
+  const status = a.type==="burst" ? "" : `<span class="code">HTTP ${r.status||"—"}</span>`;
+  res.innerHTML = `<div class="verdict ${v.cls}">${status} ${v.txt}</div>`
+    + (r.bodySnippet ? `<div class="obody">${escapeHtml(r.bodySnippet).slice(0,1500)}</div>` : "");
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+
+async function runOne(a, card){
+  const btn = $(".run", card); const old = btn.innerHTML;
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> ejecutando…';
+  const res = $(".result", card); res.classList.add("show");
+  res.innerHTML = '<div class="verdict v-run"><span class="spin"></span> lanzando ataque…</div>';
+  try{
+    const r = await (await fetch("/api/attack",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:a.id})})).json();
+    renderResult(card, a, r);
+  }catch(e){ res.innerHTML = '<div class="verdict v-vuln">error de red</div>'; }
+  btn.disabled=false; btn.innerHTML=old;
+}
+
+function cardFor(a){
+  const el = document.createElement("div");
+  el.className="card"; el.dataset.id=a.id;
+  el.innerHTML = `
+    <div class="chead">
+      <div><h3>${escapeHtml(a.title)}</h3></div>
+      <span class="tag">${a.category}</span>
+    </div>
+    <div class="why">${escapeHtml(a.why)}</div>
+    <pre>${escapeHtml(a.display)}</pre>
+    <div class="row">
+      <button class="run primary">Ejecutar ataque</button>
+      <span class="meta">Esperado: pre-WAF <b>${escapeHtml(String(a.expectPre))}</b> → post-WAF <b>${escapeHtml(String(a.expectPost))}</b> · lo bloquea <code>${escapeHtml(a.blocks)}</code></span>
+    </div>
+    <div class="result"></div>`;
+  $(".run", el).addEventListener("click", ()=>runOne(a, el));
+  return el;
+}
+
+let ATTACKS=[];
+async function init(){
+  const data = await (await fetch("/api/attacks")).json();
+  ATTACKS = data.attacks;
+  const grid = $("#grid"); grid.innerHTML="";
+  ATTACKS.forEach(a => grid.appendChild(cardFor(a)));
+  await loadState();
+}
+
+$("#runAll").addEventListener("click", async (e)=>{
+  e.target.disabled=true; const old=e.target.innerHTML; e.target.innerHTML='<span class="spin"></span> corriendo suite…';
+  // marca todas como "en curso"
+  ATTACKS.forEach(a=>{ const c=$(`.card[data-id="${a.id}"]`); $(".result",c).classList.add("show"); $(".result",c).innerHTML='<div class="verdict v-run"><span class="spin"></span> en cola…</div>'; });
+  try{
+    const data = await (await fetch("/api/suite",{method:"POST"})).json();
+    data.results.forEach(r=>{ const a=ATTACKS.find(x=>x.id===r.id); const c=$(`.card[data-id="${r.id}"]`); renderResult(c,a,r); });
+    const blocked = data.results.filter(r=>r.blocked).length;
+    toast(`Suite completa · ${blocked}/${data.results.length} mitigados ${WAF_ON?"(WAF activo)":"(WAF apagado: deberían pasar casi todos)"}`);
+  }catch(e){ toast("Error corriendo la suite"); }
+  e.target.disabled=false; e.target.innerHTML=old;
+});
+
+async function wafAction(action, btn){
+  if(action==="uninstall" && !confirm("¿Desinstalar el WAF? La app queda vulnerable hasta reinstalarlo (~30 s).")) return;
+  const old=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="spin"></span> '+(action==="install"?"instalando…":"desinstalando…");
+  toast((action==="install"?"Instalando":"Desinstalando")+" el WAF… reiniciando el controller (~30 s)", 30000);
+  try{
+    const r = await (await fetch("/api/waf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action})})).json();
+    toast(r.ok ? "WAF "+(action==="install"?"instalado":"desinstalado")+" ✓" : "Falló — ver consola del server");
+  }catch(e){ toast("Error ejecutando local.sh"); }
+  btn.disabled=false; btn.innerHTML=old;
+  await loadState();
+}
+$("#btnInstall").addEventListener("click", e=>wafAction("install", e.target));
+$("#btnUninstall").addEventListener("click", e=>wafAction("uninstall", e.target));
+$("#btnRefresh").addEventListener("click", loadState);
+
+init();
+</script>
+</body>
+</html>

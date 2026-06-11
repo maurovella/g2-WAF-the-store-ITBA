@@ -29,6 +29,7 @@ reglas custom)** sobre `ingress-nginx`, como Trabajo Práctico Especial del Tema
 | **Documento final** | [pre-analysis/pre-entrega/documento-final-tpe-waf.pdf](pre-analysis/pre-entrega/documento-final-tpe-waf.pdf) (`.md` y `.html` al lado) |
 | **Presentación** | [docs/presentacion-tpe-waf.pptx](docs/presentacion-tpe-waf.pptx) |
 | **How-to detallado del WAF** | [deploy/waf/HOWTO.md](deploy/waf/HOWTO.md) |
+| **Demo web en vivo** | [deploy/waf/demo-web/](deploy/waf/demo-web/) — `node server.js` → http://localhost:7099 |
 | **FAQ de defensa oral** | [docs/faq-defensa-tpe-waf.md](docs/faq-defensa-tpe-waf.md) |
 | **Reglas custom del WAF** | [deploy/waf/rules/the-store.conf](deploy/waf/rules/the-store.conf) (99001-99020) |
 | **Suite de ataques** | [pre-analysis/tests/](pre-analysis/tests/) — `01` pre-WAF (baseline) · `02` post-WAF (gate, 27/27) |
@@ -94,6 +95,7 @@ El tráfico legítimo sigue funcionando: `http://localhost/` → `200` y `/actua
 ### Material complementario
 
 - [deploy/waf/HOWTO.md](deploy/waf/HOWTO.md) — detalle del WAF: reglas custom, anatomía del audit log, demos guionadas.
+- [deploy/waf/demo-web/](deploy/waf/demo-web/) — **demo web en vivo**: página local para lanzar los ataques, ver el código y output, y togglear el WAF.
 - [docs/faq-defensa-tpe-waf.md](docs/faq-defensa-tpe-waf.md) — preguntas esperables de la cátedra con respuestas cortas (preparación de la exposición oral).
 - [deploy/waf/demos/](deploy/waf/demos/) — 4 scripts para correr en vivo (rate limit, DetectionOnly vs On, norte-sur vs este-oeste, TLS/HSTS).
 - [pre-analysis/pre-entrega/](pre-analysis/pre-entrega/) — documento final de pre-entrega y evidencias.
